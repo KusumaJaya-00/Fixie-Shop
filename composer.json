@@ -1,0 +1,9 @@
+{
+  "name": "jay/fixie-shop",
+  "description": "Toko Online Sepeda Fixie - PHP Native",
+  "require": {
+    "intervention/image": "^4.1",
+    "dompdf/dompdf": "^3.1",
+    "phpmailer/phpmailer": "^7.1"
+  }
+}

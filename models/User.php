@@ -83,6 +83,23 @@ class User
         return $stmt->execute($params);
     }
 
+    public function updateProfile(int $id, string $name, string $phone): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE users SET name = :name, phone = :phone WHERE id = :id'
+        );
+        $stmt->execute([':name' => $name, ':phone' => $phone, ':id' => $id]);
+    }
+
+    public function updatePassword(int $id, string $newPassword): void
+    {
+        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare(
+            'UPDATE users SET password = :password WHERE id = :id'
+        );
+        $stmt->execute([':password' => $hash, ':id' => $id]);
+    }
+
     public function delete(int $id): bool
     {
         $stmt = $this->db->prepare('DELETE FROM users WHERE id = ?');

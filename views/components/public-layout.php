@@ -23,6 +23,7 @@
                 <a href="/" class="hover:text-brand">Katalog</a>
                 <?php if (checkLogin()): ?>
                     <a href="/cart" class="hover:text-brand">Keranjang</a>
+                    <a href="/profile" class="hover:text-brand">Profile</a>
                     <span class="text-gray-400"><?= htmlspecialchars($_SESSION['user_name'] ?? '') ?></span>
                     <a href="/logout" class="hover:text-brand">Logout</a>
                 <?php else: ?>

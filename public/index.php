@@ -18,12 +18,15 @@ if ($uri === '/' || $uri === '/products') {
 } elseif ($uri === '/admin/login') {
     $controller = new AuthController($pdo);
     $controller->adminLogin();
+} elseif ($uri === '/profile') {
+    $controller = new ProfileController($pdo);
+    $controller->index();
 } elseif ($uri === '/logout') {
     $controller = new AuthController($pdo);
     $controller->logout();
 } elseif ($uri === '/admin') {
-    requireAdmin();
-    echo '<h1>Admin Overview</h1>';
+    $controller = new AdminController($pdo);
+    $controller->index();
 } elseif ($uri === '/admin/users') {
     $controller = new AdminUserController($pdo);
     $controller->index();
@@ -36,6 +39,15 @@ if ($uri === '/' || $uri === '/products') {
 } elseif ($uri === '/admin/users/delete') {
     $controller = new AdminUserController($pdo);
     $controller->delete();
+} elseif ($uri === '/admin/products') {
+    $controller = new AdminProductController($pdo);
+    $controller->index();
+} elseif ($uri === '/admin/orders') {
+    $controller = new AdminOrderController($pdo);
+    $controller->index();
+} elseif ($uri === '/admin/categories') {
+    $controller = new AdminCategoryController($pdo);
+    $controller->index();
 } else {
     http_response_code(404);
     echo 'Halaman tidak ditemukan';

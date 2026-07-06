@@ -24,8 +24,8 @@ class ProductController
 
         $title = 'Katalog Produk';
         ob_start();
-        require __DIR__ . '/../views/products/index.php';
+        require __DIR__ . '/../../views/products/catalog.php';
         $content = ob_get_clean();
-        require __DIR__ . '/../views/components/public-layout.php';
+        require __DIR__ . '/../../views/components/public-layout.php';
     }
 }

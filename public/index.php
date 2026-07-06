@@ -6,8 +6,9 @@ $pdo = require __DIR__ . '/../config/database.php';
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-if ($uri === '/' || $uri === '/home') {
-    echo '<h1>Toko Online Sepeda Fixie</h1>';
+if ($uri === '/' || $uri === '/products') {
+    $controller = new ProductController($pdo);
+    $controller->index();
 } elseif ($uri === '/register') {
     $controller = new AuthController($pdo);
     $controller->register();

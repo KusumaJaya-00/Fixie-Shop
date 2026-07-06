@@ -4,7 +4,7 @@
 <form method="POST" class="max-w-md mx-auto rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
     <div>
         <label for="email" class="block text-sm font-medium mb-1">Email Admin</label>
-        <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+        <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required
                class="w-full rounded-lg border <?= isset($errors['email']) ? 'border-red-500' : 'border-gray-300' ?> px-3 py-2 focus:ring-2 focus:ring-brand">
         <?php if (isset($errors['email'])): ?>
             <p class="text-red-600 text-sm mt-1"><?= htmlspecialchars($errors['email']) ?></p>
@@ -13,12 +13,16 @@
 
     <div>
         <label for="password" class="block text-sm font-medium mb-1">Password</label>
-        <input type="password" id="password" name="password"
+        <input type="password" id="password" name="password" required
                class="w-full rounded-lg border <?= isset($errors['password']) ? 'border-red-500' : 'border-gray-300' ?> px-3 py-2 focus:ring-2 focus:ring-brand">
         <?php if (isset($errors['password'])): ?>
             <p class="text-red-600 text-sm mt-1"><?= htmlspecialchars($errors['password']) ?></p>
         <?php endif; ?>
     </div>
+
+    <?php if (isset($errors['general'])): ?>
+        <p class="text-red-600 text-sm text-center"><?= htmlspecialchars($errors['general']) ?></p>
+    <?php endif; ?>
 
     <button type="submit" class="w-full rounded-lg bg-brand px-4 py-2 text-white font-medium hover:bg-brand-dark">
         Login

@@ -5,7 +5,7 @@ class Product
     public function __construct(private PDO $db) {}
 
     /**
-     * Ambil semua produk aktif dengan filter opsional.
+     * Ambil semua produk aktif dengan filter opsional (untuk katalog publik).
      */
     public function all(array $filters = []): array
     {
@@ -65,7 +65,7 @@ class Product
     }
 
     /**
-     * Ambil semua produk (termasuk non-aktif) — untuk admin.
+     * Ambil semua produk tanpa filter is_active — untuk admin.
      */
     public function allForAdmin(array $filters = []): array
     {
@@ -110,6 +110,7 @@ class Product
         return $stmt->fetch() ?: null;
     }
 
+    // Simpan produk baru, return ID
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
@@ -131,6 +132,7 @@ class Product
         return (int) $this->db->lastInsertId();
     }
 
+    // Update produk berdasarkan ID
     public function update(int $id, array $data): bool
     {
         $stmt = $this->db->prepare(
@@ -161,6 +163,7 @@ class Product
         return $stmt->rowCount() > 0;
     }
 
+    // Hapus produk (cascade otomatis ke product_images via FK)
     public function delete(int $id): bool
     {
         $stmt = $this->db->prepare('DELETE FROM products WHERE id = ?');
@@ -170,6 +173,7 @@ class Product
 
     // ========== METHOD GAMBAR ==========
 
+    // Ambil semua foto produk, urut: utama pertama
     public function getImages(int $productId): array
     {
         $stmt = $this->db->prepare(
@@ -179,6 +183,7 @@ class Product
         return $stmt->fetchAll();
     }
 
+    // Simpan record foto baru ke DB
     public function addImage(int $productId, string $imagePath, bool $isPrimary = false): int
     {
         $stmt = $this->db->prepare(
@@ -188,6 +193,7 @@ class Product
         return (int) $this->db->lastInsertId();
     }
 
+    // Set salah satu foto sebagai utama
     public function setPrimaryImage(int $imageId, int $productId): bool
     {
         $this->db->prepare(
@@ -201,6 +207,7 @@ class Product
         return $stmt->rowCount() > 0;
     }
 
+    // Hapus record foto & return data fotonya (agar file ikut dihapus)
     public function deleteImage(int $imageId): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM product_images WHERE id = ?');

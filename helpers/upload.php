@@ -9,7 +9,7 @@ define('UPLOAD_PATH', __DIR__ . '/../public/uploads/');
 
 /**
  * Upload array file dari input name="images[]".
- * Return array: ['success' => [nama_file, ...], 'errors' => [pesan_error, ...]]
+ * Return: ['success' => [nama_file, ...], 'errors' => [pesan_error, ...]]
  */
 function uploadImages(array $files): array
 {
@@ -23,6 +23,7 @@ function uploadImages(array $files): array
 
     $total = count($files['name']);
     for ($i = 0; $i < $total; $i++) {
+        // Skip file yang gagal diupload
         if ($files['error'][$i] !== UPLOAD_ERR_OK) {
             $result['errors'][] = 'File gagal diupload (error #' . $files['error'][$i] . ')';
             continue;
@@ -30,16 +31,19 @@ function uploadImages(array $files): array
 
         $ext = strtolower(pathinfo($files['name'][$i], PATHINFO_EXTENSION));
 
+        // Validasi ekstensi
         if (!in_array($ext, UPLOAD_ALLOWED_EXTENSIONS)) {
             $result['errors'][] = htmlspecialchars($files['name'][$i]) . ': tipe file tidak diizinkan (hanya JPG/PNG)';
             continue;
         }
 
+        // Validasi ukuran
         if ($files['size'][$i] > UPLOAD_MAX_SIZE) {
             $result['errors'][] = htmlspecialchars($files['name'][$i]) . ': ukuran melebihi 2MB';
             continue;
         }
 
+        // Generate nama unik & resize pakai Intervention Image
         $filename = uniqid('img_', true) . '.' . $ext;
         $destPath = UPLOAD_PATH . $filename;
 
@@ -59,7 +63,7 @@ function uploadImages(array $files): array
 }
 
 /**
- * Hapus file dari uploads.
+ * Hapus file dari folder uploads.
  */
 function deleteImage(string $filename): bool
 {

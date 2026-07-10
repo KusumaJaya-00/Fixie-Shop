@@ -20,6 +20,12 @@ class AdminCategoryController
     {
         requireAdmin();
 
+        if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Sesi tidak valid. Silakan coba lagi.'];
+            header('Location: /admin/products');
+            exit;
+        }
+
         $name = trim($_POST['name'] ?? '');
         if ($name !== '') {
             $category = new Category($this->db);
@@ -35,6 +41,12 @@ class AdminCategoryController
     public function update(): void
     {
         requireAdmin();
+
+        if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Sesi tidak valid. Silakan coba lagi.'];
+            header('Location: /admin/products');
+            exit;
+        }
 
         $id = (int) ($_POST['id'] ?? 0);
         $name = trim($_POST['name'] ?? '');

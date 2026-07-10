@@ -10,7 +10,7 @@ class User
             'SELECT u.*, r.name AS role_name
              FROM users u
              JOIN roles r ON u.role_id = r.id
-             ORDER BY u.created_at DESC'
+             ORDER BY u.created_at DESC, u.id ASC'
         );
         $stmt->execute();
         return $stmt->fetchAll();

@@ -3,6 +3,7 @@
     <h1 class="text-xl font-bold mt-2 mb-6"><?= isset($product) ? 'Edit Produk' : 'Tambah Produk' ?></h1>
 
     <form method="POST" enctype="multipart/form-data" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+            <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label for="title" class="block text-sm font-medium mb-1">Judul Produk <span class="text-red-500">*</span></label>

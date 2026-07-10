@@ -33,6 +33,9 @@ class AdminProductController
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+                $errors['general'] = 'Sesi tidak valid. Silakan reload halaman.';
+            } else {
             $data = $this->validateInput($errors);
             if (empty($errors)) {
                 $productModel = new Product($this->db);
@@ -45,6 +48,7 @@ class AdminProductController
                 header('Location: /admin/products');
                 exit;
             }
+        }
         }
 
         $title = 'Tambah Produk';
@@ -75,6 +79,9 @@ class AdminProductController
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+                $errors['general'] = 'Sesi tidak valid. Silakan reload halaman.';
+            } else {
             $data = $this->validateInput($errors);
             if (empty($errors)) {
                 $productModel->update($id, $data);
@@ -84,6 +91,7 @@ class AdminProductController
                 header('Location: /admin/products');
                 exit;
             }
+        }
         }
 
         $title = 'Edit Produk';

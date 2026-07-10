@@ -8,51 +8,55 @@ class AuthController
     public function register(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name     = trim($_POST['name'] ?? '');
-            $email    = trim($_POST['email'] ?? '');
-            $phone    = trim($_POST['phone'] ?? '');
-            $password = $_POST['password'] ?? '';
-            $confirm  = $_POST['password_confirm'] ?? '';
+            if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+                $errors['general'] = 'Sesi tidak valid. Silakan reload halaman.';
+            } else {
+                $name     = trim($_POST['name'] ?? '');
+                $email    = trim($_POST['email'] ?? '');
+                $phone    = trim($_POST['phone'] ?? '');
+                $password = $_POST['password'] ?? '';
+                $confirm  = $_POST['password_confirm'] ?? '';
 
-            $errors = [];
+                $errors = [];
 
-            if ($name === '') {
-                $errors['name'] = 'Nama lengkap wajib diisi.';
-            }
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors['email'] = 'Format email tidak valid.';
-            }
-            if ($phone === '' || !preg_match('/^[0-9]{10,13}$/', $phone)) {
-                $errors['phone'] = 'No. HP wajib diisi (10-13 digit angka).';
-            }
-            if (strlen($password) < 8) {
-                $errors['password'] = 'Password minimal 8 karakter.';
-            }
-            if ($password !== $confirm) {
-                $errors['password_confirm'] = 'Konfirmasi password tidak cocok.';
-            }
+                if ($name === '') {
+                    $errors['name'] = 'Nama lengkap wajib diisi.';
+                }
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errors['email'] = 'Format email tidak valid.';
+                }
+                if ($phone === '' || !preg_match('/^08[0-9]{8,11}$/', $phone)) {
+                    $errors['phone'] = 'No. HP wajib diisi (10-13 digit angka).';
+                }
+                if (strlen($password) < 8) {
+                    $errors['password'] = 'Password minimal 8 karakter.';
+                }
+                if ($password !== $confirm) {
+                    $errors['password_confirm'] = 'Konfirmasi password tidak cocok.';
+                }
 
-            if (empty($errors)) {
-                try {
-                    $user = new User($this->db);
-                    if ($user->findByEmail($email)) {
-                        $errors['email'] = 'Email sudah terdaftar.';
-                    } else {
-                        $hashed = password_hash($password, PASSWORD_DEFAULT);
-                        $user->create([
-                            'name'     => $name,
-                            'email'    => $email,
-                            'password' => $hashed,
-                            'phone'    => $phone,
-                            'role_id'  => 2,
-                        ]);
-                        $_SESSION['flash'] = ['type' => 'success', 'message' => 'Registrasi berhasil. Silakan login.'];
-                        header('Location: /login');
-                        exit;
+                if (empty($errors)) {
+                    try {
+                        $user = new User($this->db);
+                        if ($user->findByEmail($email)) {
+                            $errors['email'] = 'Email sudah terdaftar.';
+                        } else {
+                            $hashed = password_hash($password, PASSWORD_DEFAULT);
+                            $user->create([
+                                'name'     => $name,
+                                'email'    => $email,
+                                'password' => $hashed,
+                                'phone'    => $phone,
+                                'role_id'  => 2,
+                            ]);
+                            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Registrasi berhasil. Silakan login.'];
+                            header('Location: /login');
+                            exit;
+                        }
+                    } catch (PDOException $e) {
+                        error_log('Register error: ' . $e->getMessage());
+                        $errors['general'] = 'Terjadi kesalahan sistem. Silakan coba lagi.';
                     }
-                } catch (PDOException $e) {
-                    error_log('Register error: ' . $e->getMessage());
-                    $errors['general'] = 'Terjadi kesalahan sistem. Silakan coba lagi.';
                 }
             }
         }
@@ -67,6 +71,9 @@ class AuthController
     public function login(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+                $errors['general'] = 'Sesi tidak valid. Silakan reload halaman.';
+            } else {
             $email    = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
 
@@ -80,6 +87,9 @@ class AuthController
             }
 
             if (empty($errors)) {
+                if (!checkRateLimit('login_' . $email, 5, 300)) {
+                    $errors['general'] = 'Terlalu banyak percobaan login. Silakan coba lagi nanti.';
+                } else {
                 try {
                     $user = new User($this->db);
                     $data = $user->findByEmail($email);
@@ -99,7 +109,9 @@ class AuthController
                     error_log('Login error: ' . $e->getMessage());
                     $errors['general'] = 'Terjadi kesalahan sistem. Silakan coba lagi.';
                 }
+                }
             }
+        }
         }
 
         $title = 'Login';
@@ -111,7 +123,12 @@ class AuthController
 
     public function adminLogin(): void
     {
+        redirectIfAuthenticated();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+                $errors['general'] = 'Sesi tidak valid. Silakan reload halaman.';
+            } else {
             $email    = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
 
@@ -125,6 +142,9 @@ class AuthController
             }
 
             if (empty($errors)) {
+                if (!checkRateLimit('admin_login_' . $email, 3, 300)) {
+                    $errors['general'] = 'Terlalu banyak percobaan login. Silakan coba lagi nanti.';
+                } else {
                 try {
                     $user = new User($this->db);
                     $data = $user->findByEmail($email);
@@ -144,7 +164,9 @@ class AuthController
                     error_log('Admin login error: ' . $e->getMessage());
                     $errors['general'] = 'Terjadi kesalahan sistem. Silakan coba lagi.';
                 }
+                }
             }
+        }
         }
 
         $title = 'Admin Login';

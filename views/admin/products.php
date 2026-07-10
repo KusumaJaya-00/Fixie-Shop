@@ -90,6 +90,7 @@
         <div class="p-6 overflow-y-auto">
             <!-- Form tambah kategori -->
             <form method="POST" action="/admin/categories/store" class="flex gap-2 mb-4">
+                    <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
                 <input type="text" name="name" placeholder="Nama kategori baru" required
                        class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand">
                 <button type="submit" class="rounded-lg bg-brand px-4 py-2 text-sm text-white font-medium hover:bg-brand-dark shrink-0">Tambah</button>
@@ -103,6 +104,7 @@
                     <?php foreach ($categories as $cat): ?>
                         <!-- Tiap kategori: tampilan baca ↔ edit inline -->
                         <form method="POST" action="/admin/categories/update" class="rounded-lg border border-gray-200 px-4 py-2.5 flex items-center justify-between">
+                            <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
                             <input type="hidden" name="id" value="<?= $cat['id'] ?>">
 
                             <!-- Tampilan baca: teks biasa + tombol Edit/Hapus -->

@@ -36,6 +36,38 @@ function requireAdmin(): void
     }
 }
 
+function generateCsrfToken(): string
+{
+    if (empty($_SESSION['_csrf_token'])) {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['_csrf_token'];
+}
+
+function verifyCsrfToken(string $token): bool
+{
+    $enabled = false; // false = matiin CSRF buat demo
+    if (!$enabled) {
+        return true;
+    }
+    return hash_equals($_SESSION['_csrf_token'] ?? '', $token);
+}
+
+function checkRateLimit(string $key, int $maxAttempts = 5, int $window = 300): bool
+{
+    $now = time();
+    $attempts = $_SESSION['_rate_limit'][$key] ?? ['count' => 0, 'reset' => $now + $window];
+
+    if ($now > $attempts['reset']) {
+        $attempts = ['count' => 0, 'reset' => $now + $window];
+    }
+
+    $attempts['count']++;
+    $_SESSION['_rate_limit'][$key] = $attempts;
+
+    return $attempts['count'] <= $maxAttempts;
+}
+
 function redirectIfAuthenticated(): void
 {
     if (!checkLogin()) {

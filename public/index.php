@@ -2,11 +2,8 @@
 session_start();
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../helpers/auth.php';
-<<<<<<< HEAD
 require __DIR__ . '/../helpers/upload.php';
-=======
 require __DIR__ . '/../helpers/invoice.php';
->>>>>>> kresna/transaksi-dan-invoice
 $pdo = require __DIR__ . '/../config/database.php';
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -65,17 +62,6 @@ if ($uri === '/' || $uri === '/products') {
 } elseif ($uri === '/admin/orders') {
     $controller = new AdminOrderController($pdo);
     $controller->index();
-<<<<<<< HEAD
-} elseif ($uri === '/admin/categories/store') {
-    $controller = new AdminCategoryController($pdo);
-    $controller->store();
-} elseif ($uri === '/admin/categories/update') {
-    $controller = new AdminCategoryController($pdo);
-    $controller->update();
-} elseif ($uri === '/admin/categories/delete') {
-    $controller = new AdminCategoryController($pdo);
-    $controller->delete();
-=======
 } elseif ($uri === '/admin/orders/detail') {
     $controller = new AdminOrderController($pdo);
     $controller->detail();
@@ -85,7 +71,15 @@ if ($uri === '/' || $uri === '/products') {
 } elseif ($uri === '/admin/orders/status') {
     $controller = new AdminOrderController($pdo);
     $controller->updateStatus();
->>>>>>> kresna/transaksi-dan-invoice
+} elseif ($uri === '/admin/categories/store') {
+    $controller = new AdminCategoryController($pdo);
+    $controller->store();
+} elseif ($uri === '/admin/categories/update') {
+    $controller = new AdminCategoryController($pdo);
+    $controller->update();
+} elseif ($uri === '/admin/categories/delete') {
+    $controller = new AdminCategoryController($pdo);
+    $controller->delete();
 } elseif ($uri === '/admin/categories') {
     $controller = new AdminCategoryController($pdo);
     $controller->index();

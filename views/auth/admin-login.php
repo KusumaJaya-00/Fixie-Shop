@@ -2,6 +2,7 @@
 <p class="text-gray-500 text-sm text-center mt-1 mb-6">Masuk sebagai admin</p>
 
 <form method="POST" class="max-w-md mx-auto rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+        <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
     <div>
         <label for="email" class="block text-sm font-medium mb-1">Email Admin</label>
         <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required

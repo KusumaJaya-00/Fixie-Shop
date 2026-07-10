@@ -1,4 +1,4 @@
-<div class="max-w-2xl">
+<div>
     <a href="/admin/products" class="text-sm text-brand hover:underline">&larr; Kembali</a>
     <h1 class="text-xl font-bold mt-2 mb-6"><?= isset($product) ? 'Edit Produk' : 'Tambah Produk' ?></h1>
 

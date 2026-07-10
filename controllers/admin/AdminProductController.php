@@ -4,13 +4,17 @@ class AdminProductController
 {
     public function __construct(private PDO $db) {}
 
-    // Tampilkan daftar semua produk
+    // Tampilkan daftar semua produk + kategori (untuk modal)
     public function index(): void
     {
         requireAdmin();
 
         $productModel = new Product($this->db);
         $products = $productModel->allForAdmin();
+
+        // Ambil data kategori untuk modal kelola kategori
+        $categoryModel = new Category($this->db);
+        $categories = $categoryModel->all();
 
         $title = 'Kelola Produk';
         ob_start();

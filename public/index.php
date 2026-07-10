@@ -61,6 +61,15 @@ if ($uri === '/' || $uri === '/products') {
 } elseif ($uri === '/admin/orders') {
     $controller = new AdminOrderController($pdo);
     $controller->index();
+} elseif ($uri === '/admin/categories/store') {
+    $controller = new AdminCategoryController($pdo);
+    $controller->store();
+} elseif ($uri === '/admin/categories/update') {
+    $controller = new AdminCategoryController($pdo);
+    $controller->update();
+} elseif ($uri === '/admin/categories/delete') {
+    $controller = new AdminCategoryController($pdo);
+    $controller->delete();
 } elseif ($uri === '/admin/categories') {
     $controller = new AdminCategoryController($pdo);
     $controller->index();

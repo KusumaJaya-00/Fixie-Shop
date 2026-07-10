@@ -26,6 +26,9 @@ class ProfileController
         $passwordSuccess = false;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+                $errors['general'] = 'Sesi tidak valid. Silakan reload halaman.';
+            } else {
             $action = $_GET['action'] ?? '';
 
             if ($action === 'update_profile') {
@@ -35,8 +38,8 @@ class ProfileController
                 if ($name === '') {
                     $errors['name'] = 'Nama lengkap wajib diisi.';
                 }
-                if ($phone === '') {
-                    $errors['phone'] = 'Nomor HP wajib diisi.';
+                if ($phone === '' || !preg_match('/^08[0-9]{8,11}$/', $phone)) {
+                    $errors['phone'] = 'Nomor HP wajib diisi 10-13 digit angka.';
                 }
 
                 if (empty($errors)) {
@@ -68,6 +71,7 @@ class ProfileController
                     exit;
                 }
             }
+        }
         }
 
         $title = 'Akun Saya';

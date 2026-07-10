@@ -3,6 +3,7 @@
     <h1 class="text-xl font-bold mt-2 mb-6">Edit User</h1>
 
     <form method="POST" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+            <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
         <div>
             <label for="name" class="block text-sm font-medium mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
             <input type="text" id="name" name="name" value="<?= htmlspecialchars($_POST['name'] ?? $user['name']) ?>"

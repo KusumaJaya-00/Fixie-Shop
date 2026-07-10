@@ -55,12 +55,6 @@ if ($uri === '/' || $uri === '/products') {
 } elseif ($uri === '/admin/products/delete-image') {
     $controller = new AdminProductController($pdo);
     $controller->deleteImage();
-} elseif ($uri === '/admin/products') {
-    $controller = new AdminProductController($pdo);
-    $controller->index();
-} elseif ($uri === '/admin/orders') {
-    $controller = new AdminOrderController($pdo);
-    $controller->index();
 } elseif ($uri === '/admin/categories/store') {
     $controller = new AdminCategoryController($pdo);
     $controller->store();
@@ -70,8 +64,11 @@ if ($uri === '/' || $uri === '/products') {
 } elseif ($uri === '/admin/categories/delete') {
     $controller = new AdminCategoryController($pdo);
     $controller->delete();
-} elseif ($uri === '/admin/categories') {
-    $controller = new AdminCategoryController($pdo);
+} elseif ($uri === '/admin/products') {
+    $controller = new AdminProductController($pdo);
+    $controller->index();
+} elseif ($uri === '/admin/orders') {
+    $controller = new AdminOrderController($pdo);
     $controller->index();
 } else {
     http_response_code(404);

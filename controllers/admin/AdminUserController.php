@@ -24,6 +24,9 @@ class AdminUserController
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+                $errors['general'] = 'Sesi tidak valid. Silakan reload halaman.';
+            } else {
             $name     = trim($_POST['name'] ?? '');
             $email    = trim($_POST['email'] ?? '');
             $phone    = trim($_POST['phone'] ?? '');
@@ -36,7 +39,7 @@ class AdminUserController
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors['email'] = 'Email tidak valid.';
             }
-            if ($phone !== '' && !preg_match('/^[0-9]{10,13}$/', $phone)) {
+            if ($phone !== '' && !preg_match('/^08[0-9]{8,11}$/', $phone)) {
                 $errors['phone'] = 'No. HP harus 10-13 digit angka.';
             }
             if (strlen($password) < 8) {
@@ -59,6 +62,7 @@ class AdminUserController
                     header('Location: /admin/users');
                     exit;
                 }
+            }
             }
         }
 
@@ -85,6 +89,9 @@ class AdminUserController
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!verifyCsrfToken($_POST['_csrf_token'] ?? '')) {
+                $errors['general'] = 'Sesi tidak valid. Silakan reload halaman.';
+            } else {
             $name   = trim($_POST['name'] ?? '');
             $email  = trim($_POST['email'] ?? '');
             $phone  = trim($_POST['phone'] ?? '');
@@ -96,7 +103,7 @@ class AdminUserController
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors['email'] = 'Email tidak valid.';
             }
-            if ($phone !== '' && !preg_match('/^[0-9]{10,13}$/', $phone)) {
+            if ($phone !== '' && !preg_match('/^08[0-9]{8,11}$/', $phone)) {
                 $errors['phone'] = 'No. HP harus 10-13 digit angka.';
             }
 
@@ -116,6 +123,7 @@ class AdminUserController
                     exit;
                 }
             }
+        }
         }
 
         $title = 'Edit User';

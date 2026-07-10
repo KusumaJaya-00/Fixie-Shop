@@ -4,6 +4,7 @@
     <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <h2 class="text-lg font-semibold mb-4">Data Diri</h2>
         <form method="POST" action="/profile?action=update_profile">
+                <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
             <div class="space-y-4">
                 <div>
                     <label for="name" class="block text-sm font-medium mb-1">Nama Lengkap <span class="text-red-600">*</span></label>
@@ -38,6 +39,7 @@
     <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
         <h2 class="text-lg font-semibold mb-4">Ganti Password</h2>
         <form method="POST" action="/profile?action=change_password">
+                <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
             <div class="space-y-4">
                 <div>
                     <label for="old_password" class="block text-sm font-medium mb-1">Password Lama <span class="text-red-600">*</span></label>

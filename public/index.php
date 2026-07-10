@@ -2,6 +2,7 @@
 session_start();
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../helpers/auth.php';
+require __DIR__ . '/../helpers/upload.php';
 $pdo = require __DIR__ . '/../config/database.php';
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -39,6 +40,21 @@ if ($uri === '/' || $uri === '/products') {
 } elseif ($uri === '/admin/users/delete') {
     $controller = new AdminUserController($pdo);
     $controller->delete();
+} elseif ($uri === '/admin/products/create') {
+    $controller = new AdminProductController($pdo);
+    $controller->create();
+} elseif ($uri === '/admin/products/edit') {
+    $controller = new AdminProductController($pdo);
+    $controller->edit();
+} elseif ($uri === '/admin/products/delete') {
+    $controller = new AdminProductController($pdo);
+    $controller->delete();
+} elseif ($uri === '/admin/products/primary') {
+    $controller = new AdminProductController($pdo);
+    $controller->setPrimary();
+} elseif ($uri === '/admin/products/delete-image') {
+    $controller = new AdminProductController($pdo);
+    $controller->deleteImage();
 } elseif ($uri === '/admin/products') {
     $controller = new AdminProductController($pdo);
     $controller->index();

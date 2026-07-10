@@ -98,30 +98,33 @@
             <?php if (empty($categories)): ?>
                 <p class="text-gray-400 text-sm text-center py-4">Belum ada kategori.</p>
             <?php else: ?>
-                <!-- Daftar kategori + tombol Edit/Hapus -->
+                <!-- Daftar kategori + inline edit -->
                 <div class="space-y-2">
                     <?php foreach ($categories as $cat): ?>
-                        <div class="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2.5">
-                            <span class="text-sm font-medium"><?= htmlspecialchars($cat['name']) ?></span>
-                            <div class="flex gap-2">
-                                <button type="button"
-                                        onclick="editKategori(<?= $cat['id'] ?>, '<?= htmlspecialchars($cat['name'], ENT_QUOTES) ?>')"
+                        <!-- Tiap kategori: tampilan baca ↔ edit inline -->
+                        <form method="POST" action="/admin/categories/update" class="rounded-lg border border-gray-200 px-4 py-2.5 flex items-center justify-between">
+                            <input type="hidden" name="id" value="<?= $cat['id'] ?>">
+
+                            <!-- Tampilan baca: teks biasa + tombol Edit/Hapus -->
+                            <span id="cat-text-<?= $cat['id'] ?>" class="text-sm font-medium flex-1"><?= htmlspecialchars($cat['name']) ?></span>
+                            <input id="cat-input-<?= $cat['id'] ?>" type="text" name="name"
+                                   value="<?= htmlspecialchars($cat['name']) ?>" required
+                                   class="hidden flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-brand">
+
+                            <div id="cat-actions-<?= $cat['id'] ?>" class="flex gap-2 shrink-0 ml-2">
+                                <button type="button" onclick="editKategori(<?= $cat['id'] ?>)"
                                         class="text-xs text-brand hover:underline">Edit</button>
                                 <a href="/admin/categories/delete?id=<?= $cat['id'] ?>"
                                    class="text-xs text-red-600 hover:underline"
                                    onclick="return confirm('Yakin ingin menghapus kategori ini?')">Hapus</a>
                             </div>
-                        </div>
 
-                        <!-- Form edit kategori (muncul setelah klik Edit) -->
-                        <form id="edit-form-<?= $cat['id'] ?>" method="POST" action="/admin/categories/update"
-                              class="hidden ml-4 mb-2 flex gap-2">
-                            <input type="hidden" name="id" value="<?= $cat['id'] ?>">
-                            <input type="text" name="name" value="<?= htmlspecialchars($cat['name']) ?>" required
-                                   class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand">
-                            <button type="submit" class="rounded-lg bg-brand px-4 py-2 text-sm text-white font-medium hover:bg-brand-dark shrink-0">Simpan</button>
-                            <button type="button" onclick="document.getElementById('edit-form-<?= $cat['id'] ?>').classList.add('hidden')"
-                                    class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 font-medium hover:bg-gray-50">Batal</button>
+                            <!-- Tampilan edit: input + tombol Simpan/Batal -->
+                            <div id="cat-edit-actions-<?= $cat['id'] ?>" class="hidden gap-2 shrink-0 ml-2">
+                                <button type="submit" class="rounded-lg bg-brand px-3 py-1.5 text-xs text-white font-medium hover:bg-brand-dark">Simpan</button>
+                                <button type="button" onclick="batalEdit(<?= $cat['id'] ?>, '<?= htmlspecialchars($cat['name'], ENT_QUOTES) ?>')"
+                                        class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs text-gray-700 font-medium hover:bg-gray-50">Batal</button>
+                            </div>
                         </form>
                     <?php endforeach; ?>
                 </div>
@@ -131,7 +134,19 @@
 </div>
 
 <script>
-function editKategori(id, name) {
-    document.getElementById('edit-form-' + id).classList.remove('hidden');
+function editKategori(id) {
+    document.getElementById('cat-text-' + id).classList.add('hidden');
+    document.getElementById('cat-actions-' + id).classList.add('hidden');
+    document.getElementById('cat-input-' + id).classList.remove('hidden');
+    document.getElementById('cat-edit-actions-' + id).classList.remove('hidden');
+    document.getElementById('cat-input-' + id).focus();
+}
+
+function batalEdit(id, originalName) {
+    document.getElementById('cat-text-' + id).classList.remove('hidden');
+    document.getElementById('cat-actions-' + id).classList.remove('hidden');
+    document.getElementById('cat-input-' + id).classList.add('hidden');
+    document.getElementById('cat-edit-actions-' + id).classList.add('hidden');
+    document.getElementById('cat-input-' + id).value = originalName;
 }
 </script>

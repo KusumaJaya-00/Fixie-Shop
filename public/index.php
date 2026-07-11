@@ -11,6 +11,28 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 if ($uri === '/' || $uri === '/products') {
     $controller = new ProductController($pdo);
     $controller->index();
+} elseif ($uri === '/product') {
+    $controller = new ProductController($pdo);
+    $controller->show();
+} elseif ($uri === '/cart') {
+    $controller = new CartController($pdo);
+    $controller->index();
+} elseif ($uri === '/cart/add') {
+    $controller = new CartController($pdo);
+    $controller->add();
+} elseif ($uri === '/cart/update') {
+    $controller = new CartController($pdo);
+    $controller->update();
+} elseif ($uri === '/cart/remove') {
+    $controller = new CartController($pdo);
+    $controller->remove();
+} elseif ($uri === '/checkout') {
+    $controller = new OrderController($pdo);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller->process();
+    } else {
+        $controller->checkoutPage();
+    }
 } elseif ($uri === '/register') {
     $controller = new AuthController($pdo);
     $controller->register();

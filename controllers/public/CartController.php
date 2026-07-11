@@ -44,9 +44,9 @@ class CartController
 
         $title = 'Keranjang Belanja';
         ob_start();
-        require __DIR__ . '/../views/cart/cart.php';
+        require __DIR__ . '/../../views/cart/cart.php';
         $content = ob_get_clean();
-        require __DIR__ . '/../views/components/public-layout.php';
+        require __DIR__ . '/../../views/components/public-layout.php';
     }
 
     public function add(): void

@@ -26,6 +26,13 @@ if ($uri === '/' || $uri === '/products') {
 } elseif ($uri === '/cart/remove') {
     $controller = new CartController($pdo);
     $controller->remove();
+} elseif ($uri === '/checkout') {
+    $controller = new OrderController($pdo);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller->process();
+    } else {
+        $controller->checkoutPage();
+    }
 } elseif ($uri === '/register') {
     $controller = new AuthController($pdo);
     $controller->register();

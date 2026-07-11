@@ -21,10 +21,9 @@
             Fixie Shop
         </div>
         <nav class="flex-1 py-4 space-y-1 px-3 text-sm">
-            <a href="/admin" class="block rounded-lg px-3 py-2 hover:bg-slate-700">Ringkasan</a>
+            <a href="/admin" class="block rounded-lg px-3 py-2 hover:bg-slate-700">Dashboard</a>
             <a href="/admin/products" class="block rounded-lg px-3 py-2 hover:bg-slate-700">Produk</a>
             <a href="/admin/orders" class="block rounded-lg px-3 py-2 hover:bg-slate-700">Pesanan</a>
-            <a href="/admin/categories" class="block rounded-lg px-3 py-2 hover:bg-slate-700">Kategori</a>
             <a href="/admin/users" class="block rounded-lg px-3 py-2 hover:bg-slate-700">User</a>
         </nav>
         <div class="px-3 py-4 border-t border-slate-700">

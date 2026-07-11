@@ -10,7 +10,7 @@ class User
             'SELECT u.*, r.name AS role_name
              FROM users u
              JOIN roles r ON u.role_id = r.id
-             ORDER BY u.created_at DESC'
+             ORDER BY u.created_at DESC, u.id ASC'
         );
         $stmt->execute();
         return $stmt->fetchAll();
@@ -81,6 +81,23 @@ class User
         $sql = 'UPDATE users SET ' . implode(', ', $fields) . ' WHERE id = :id';
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($params);
+    }
+
+    public function updateProfile(int $id, string $name, string $phone): void
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE users SET name = :name, phone = :phone WHERE id = :id'
+        );
+        $stmt->execute([':name' => $name, ':phone' => $phone, ':id' => $id]);
+    }
+
+    public function updatePassword(int $id, string $newPassword): void
+    {
+        $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare(
+            'UPDATE users SET password = :password WHERE id = :id'
+        );
+        $stmt->execute([':password' => $hash, ':id' => $id]);
     }
 
     public function delete(int $id): bool

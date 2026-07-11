@@ -195,7 +195,7 @@ class AdminProductController
         return $data;
     }
 
-    // Upload & simpan record foto
+    // Upload & simpan record foto, tampilkan error jika gagal
     private function handleImageUpload(int $productId): void
     {
         if (empty($_FILES['images']['name'][0])) {
@@ -204,6 +204,12 @@ class AdminProductController
 
         $productModel = new Product($this->db);
         $uploadResult = uploadImages($_FILES['images']);
+
+        // Tampilkan error upload ke user
+        if (!empty($uploadResult['errors'])) {
+            $msg = 'Foto gagal diupload: ' . implode('. ', $uploadResult['errors']);
+            $_SESSION['flash'] = ['type' => 'error', 'message' => $msg];
+        }
 
         foreach ($uploadResult['success'] as $filename) {
             $existingImages = $productModel->getImages($productId);

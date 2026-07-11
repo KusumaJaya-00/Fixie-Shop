@@ -57,11 +57,46 @@ class Product
             $sql .= ' AND ' . implode(' AND ', $conditions);
         }
 
-        $sql .= ' ORDER BY p.created_at DESC';
+        $allowedSort = [
+            'terbaru'  => 'p.created_at DESC',
+            'termurah' => 'p.price ASC',
+            'termahal' => 'p.price DESC',
+            'nama-asc' => 'p.title ASC',
+            'nama-desc' => 'p.title DESC',
+        ];
+        $sort = $filters['sort'] ?? 'terbaru';
+        $sql .= ' ORDER BY ' . ($allowedSort[$sort] ?? 'p.created_at DESC');
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    public function getDistinctBrands(): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT DISTINCT brand FROM products WHERE is_active = 1 AND brand IS NOT NULL AND brand != \'\' ORDER BY brand ASC'
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function getDistinctColors(): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT DISTINCT color FROM products WHERE is_active = 1 AND color IS NOT NULL AND color != \'\' ORDER BY color ASC'
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function getDistinctFrameSizes(): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT DISTINCT frame_size FROM products WHERE is_active = 1 AND frame_size IS NOT NULL AND frame_size != \'\' ORDER BY frame_size ASC'
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**

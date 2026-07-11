@@ -11,7 +11,7 @@ class ProductController
 
         // Ambil filter dari query string
         $filters = [];
-        $filterKeys = ['category_id', 'brand', 'color', 'frame_size', 'price_min', 'price_max', 'search'];
+        $filterKeys = ['category_id', 'brand', 'color', 'frame_size', 'price_min', 'price_max', 'search', 'sort'];
         foreach ($filterKeys as $key) {
             $val = trim($_GET[$key] ?? '');
             if ($val !== '') {
@@ -19,8 +19,11 @@ class ProductController
             }
         }
 
-        $products   = $productModel->all($filters);
-        $categories = $categoryModel->all();
+        $products      = $productModel->all($filters);
+        $categories    = $categoryModel->all();
+        $brands        = $productModel->getDistinctBrands();
+        $colors        = $productModel->getDistinctColors();
+        $frameSizes    = $productModel->getDistinctFrameSizes();
 
         $title = 'Katalog Produk';
         ob_start();

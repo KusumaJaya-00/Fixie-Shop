@@ -42,7 +42,7 @@ class ProductController
                . '<a href="/" class="inline-flex items-center justify-center rounded-lg bg-brand px-4 py-2 text-white font-medium hover:bg-brand-dark">Kembali ke Katalog</a>'
                . '</div>';
             $content = ob_get_clean();
-            require __DIR__ . '/../views/components/public-layout.php';
+            require __DIR__ . '/../../views/components/public-layout.php';
             return;
         }
 
@@ -59,7 +59,7 @@ class ProductController
                . '<a href="/" class="inline-flex items-center justify-center rounded-lg bg-brand px-4 py-2 text-white font-medium hover:bg-brand-dark">Kembali ke Katalog</a>'
                . '</div>';
             $content = ob_get_clean();
-            require __DIR__ . '/../views/components/public-layout.php';
+            require __DIR__ . '/../../views/components/public-layout.php';
             return;
         }
 
@@ -67,8 +67,8 @@ class ProductController
 
         $title = $product['title'];
         ob_start();
-        require __DIR__ . '/../views/products/detail.php';
+        require __DIR__ . '/../../views/products/detail.php';
         $content = ob_get_clean();
-        require __DIR__ . '/../views/components/public-layout.php';
+        require __DIR__ . '/../../views/components/public-layout.php';
     }
 }

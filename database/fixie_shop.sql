@@ -1,5 +1,3 @@
--- Import: mysql -u root -p < database/fixie_shop.sql  (atau via phpMyAdmin > Import)
-
 CREATE DATABASE IF NOT EXISTS fixie_shop;
 USE fixie_shop;
 
@@ -14,7 +12,7 @@ CREATE TABLE users (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    phone VARCHAR(20),
+    phone VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
@@ -82,7 +80,3 @@ INSERT INTO roles (id, name) VALUES (1, 'admin'), (2, 'buyer');
 
 INSERT INTO categories (name) VALUES
   ('Sepeda Fixie'), ('Frame'), ('Wheelset'), ('Sparepart'), ('Aksesoris');
-
--- CATATAN: akun admin & buyer demo TIDAK di-insert di sini,
--- karena password WAJIB di-hash PHP (password_hash).
--- Jalankan: php database/seed.php  untuk membuat akun demo.

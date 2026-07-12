@@ -1,10 +1,10 @@
 <?php
-// Jalankan sekali: php database/seed.php
+// Jalankan sekali: php database/seeder.php
 $pdo = require __DIR__ . '/../config/database.php';
 
 $users = [
     ['role_id' => 1, 'name' => 'Admin Gaul',  'email' => 'admin@gmail.com', 'password' => 'password', 'phone' => '08123456789'],
-    ['role_id' => 2, 'name' => 'Asep Turbo', 'email' => 'buyer@gmail.com', 'password' => 'password', 'phone' => '08987654321'],
+    ['role_id' => 2, 'name' => 'Asep Turbo', 'email' => 'user@gmail.com', 'password' => 'password', 'phone' => '08987654321'],
 ];
 
 $stmt = $pdo->prepare(

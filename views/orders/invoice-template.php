@@ -139,7 +139,8 @@
                     <div class="info-title">Detail Pesanan</div>
                     Nomor Order: <strong>#<?= htmlspecialchars((string) $order['id']) ?></strong><br>
                     Tanggal: <?= date('d M Y H:i', strtotime($order['created_at'])) ?><br>
-                    Status: <span style="color: #16a34a; font-weight: bold;">PAID</span>
+                    Status: <span style="color: #16a34a; font-weight: bold;">PAID</span><br>
+                    Alamat Kirim: <?= nl2br(htmlspecialchars($order['shipping_address'])) ?>
                 </td>
             </tr>
         </table>
@@ -169,8 +170,23 @@
         </table>
 
         <!-- Perhitungan Total -->
+        <?php
+        $subtotal = 0;
+        foreach ($order['items'] as $item) {
+            $subtotal += $item['price'] * $item['qty'];
+        }
+        $shippingCost = (float) ($order['shipping_cost'] ?? 0);
+        ?>
         <div class="total-box">
             <table class="total-table">
+                <tr>
+                    <td>Subtotal:</td>
+                    <td class="text-right">Rp<?= number_format($subtotal, 0, ',', '.') ?></td>
+                </tr>
+                <tr>
+                    <td>Ongkos Kirim:</td>
+                    <td class="text-right">Rp<?= number_format($shippingCost, 0, ',', '.') ?></td>
+                </tr>
                 <tr class="total-row">
                     <td>Total Bayar:</td>
                     <td class="text-right">Rp<?= number_format($order['total_price'], 0, ',', '.') ?></td>

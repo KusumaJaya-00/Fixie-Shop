@@ -100,6 +100,8 @@ function sendInvoiceEmail(int $orderId, string $pdfPath): void
     
     // Format tanggal & harga
     $orderDate = date('d M Y H:i', strtotime($order['created_at']));
+    $shippingCost = (float) ($order['shipping_cost'] ?? 0);
+    $formattedShipping = 'Rp' . number_format($shippingCost, 0, ',', '.');
     $formattedTotal = 'Rp' . number_format($order['total_price'], 0, ',', '.');
 
     // Email Body
@@ -119,10 +121,16 @@ function sendInvoiceEmail(int $orderId, string $pdfPath): void
                     <td style='padding: 8px 0; border-bottom: 1px solid #f3f4f6; text-align: right;'>{$orderDate}</td>
                 </tr>
                 <tr>
+                    <td style='padding: 8px 0; border-bottom: 1px solid #f3f4f6;'><strong>Ongkos Kirim:</strong></td>
+                    <td style='padding: 8px 0; border-bottom: 1px solid #f3f4f6; text-align: right;'>{$formattedShipping}</td>
+                </tr>
+                <tr>
                     <td style='padding: 8px 0; border-bottom: 1px solid #f3f4f6; color: #2563eb;'><strong>Total Pembayaran:</strong></td>
                     <td style='padding: 8px 0; border-bottom: 1px solid #f3f4f6; text-align: right; font-weight: bold; color: #2563eb;'>{$formattedTotal}</td>
                 </tr>
             </table>
+
+            <p><strong>Alamat Pengiriman:</strong><br>" . nl2br(htmlspecialchars($order['shipping_address'])) . "</p>
 
             <p>Kami telah melampirkan file invoice resmi dalam format PDF pada email ini untuk kenyamanan Anda.</p>
             <p>Pesanan Anda saat ini sedang disiapkan untuk pengiriman. Kami akan menginformasikan nomor resi pengiriman setelah pesanan dikirim.</p>
@@ -133,7 +141,7 @@ function sendInvoiceEmail(int $orderId, string $pdfPath): void
         </div>
     ";
 
-    $mail->AltBody = "Halo " . $order['buyer_name'] . ",\n\nTerima kasih atas pembayaran Anda. Pembayaran untuk pesanan #{$orderId} telah berhasil diverifikasi.\n\nDetail Pesanan:\n- Nomor Order: #{$orderId}\n- Tanggal Pesanan: {$orderDate}\n- Total Pembayaran: {$formattedTotal}\n\nInvoice PDF resmi telah dilampirkan pada email ini.\n\nSalam hangat,\nFixie Shop";
+    $mail->AltBody = "Halo " . $order['buyer_name'] . ",\n\nTerima kasih atas pembayaran Anda. Pembayaran untuk pesanan #{$orderId} telah berhasil diverifikasi.\n\nDetail Pesanan:\n- Nomor Order: #{$orderId}\n- Tanggal Pesanan: {$orderDate}\n- Ongkos Kirim: {$formattedShipping}\n- Total Pembayaran: {$formattedTotal}\n- Alamat Kirim: " . $order['shipping_address'] . "\n\nInvoice PDF resmi telah dilampirkan pada email ini.\n\nSalam hangat,\nFixie Shop";
 
     $mail->send();
 }

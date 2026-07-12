@@ -96,7 +96,7 @@ function sendInvoiceEmail(int $orderId, string $pdfPath): void
 
     // Konten Email
     $mail->isHTML(true);
-    $mail->Subject = "Invoice Pesanan #{$orderId} — Fixie Shop";
+    $mail->Subject = "Invoice Pesanan #{$orderId} - Fixie Shop";
     
     // Format tanggal & harga
     $orderDate = date('d M Y H:i', strtotime($order['created_at']));

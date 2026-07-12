@@ -1,5 +1,8 @@
 <?php
 
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+
 class OrderController
 {
     public function __construct(private PDO $db) {}
@@ -206,24 +209,35 @@ class OrderController
         // Total price = subtotal produk + ongkos kirim
         $totalPrice = $subtotalPrice + $shippingCost;
 
-        $files = [
-            'name'     => [$_FILES['proof']['name']],
-            'type'     => [$_FILES['proof']['type']],
-            'tmp_name' => [$_FILES['proof']['tmp_name']],
-            'error'    => [$_FILES['proof']['error']],
-            'size'     => [$_FILES['proof']['size']],
-        ];
+        // Upload bukti transfer ke subfolder payments/
+        $proofDir = UPLOAD_PATH . 'payments/';
+        $ext = strtolower(pathinfo($_FILES['proof']['name'], PATHINFO_EXTENSION));
 
-        $uploadResult = uploadImages($files);
-
-        if (empty($uploadResult['success'])) {
-            $errorMsg = $uploadResult['errors'][0] ?? 'Gagal mengupload bukti transfer.';
-            $_SESSION['flash'] = ['type' => 'error', 'message' => $errorMsg];
+        if (!in_array($ext, UPLOAD_ALLOWED_EXTENSIONS)) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Tipe file bukti transfer tidak diizinkan (hanya JPG/PNG).'];
             header('Location: /checkout');
             exit;
         }
 
-        $proofImage = $uploadResult['success'][0];
+        if ($_FILES['proof']['size'] > UPLOAD_MAX_SIZE) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Ukuran bukti transfer melebihi 2MB.'];
+            header('Location: /checkout');
+            exit;
+        }
+
+        $proofImage = 'proof_' . $buyerId . '_' . uniqid() . '.' . $ext;
+
+        try {
+            $manager = new ImageManager(new Driver());
+            $image = $manager->decode($_FILES['proof']['tmp_name']);
+            $image->scaleDown(width: UPLOAD_MAX_WIDTH)
+                  ->save($proofDir . $proofImage);
+        } catch (\Exception $e) {
+            error_log('Upload proof error: ' . $e->getMessage());
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Gagal memproses bukti transfer.'];
+            header('Location: /checkout');
+            exit;
+        }
 
         try {
             $this->db->beginTransaction();
@@ -257,7 +271,10 @@ class OrderController
             $this->db->rollBack();
 
             if (isset($proofImage)) {
-                deleteImage($proofImage);
+                $proofPath = UPLOAD_PATH . 'payments/' . $proofImage;
+                if (file_exists($proofPath)) {
+                    unlink($proofPath);
+                }
             }
 
             error_log('Checkout error: ' . $e->getMessage());

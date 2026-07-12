@@ -54,7 +54,7 @@ function uploadImages(array $files): array
         }
 
         // Generate nama unik & resize pakai Intervention Image
-        $filename = uniqid('img_', true) . '.' . $ext;
+        $filename = 'product_' . uniqid() . '.' . $ext;
         $destPath = UPLOAD_PATH . $filename;
 
         try {

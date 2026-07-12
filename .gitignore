@@ -4,4 +4,3 @@
 /vendor/
 .env
 opencode.json
-config/mailer.php

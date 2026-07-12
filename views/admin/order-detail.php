@@ -76,7 +76,7 @@ foreach ($order['items'] as $item) {
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
                                     <?php if (!empty($item['primary_image'])): ?>
-                                        <img src="/<?= htmlspecialchars($item['primary_image']) ?>"
+                                        <img src="/uploads/<?= htmlspecialchars($item['primary_image']) ?>"
                                              alt="<?= htmlspecialchars($item['title']) ?>"
                                              class="w-10 h-10 rounded-lg object-cover shrink-0">
                                     <?php else: ?>

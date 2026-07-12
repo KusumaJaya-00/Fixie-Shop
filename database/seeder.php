@@ -162,7 +162,7 @@ $products = [
         'color' => 'Carbon Black',
         'is_active' => 1,
         'images' => [
-            ['path' => 'WEAPON C60 60mm Fixie Carbon Fiber Wheel (Ultralight).png', 'is_primary' => 1]
+            ['path' => 'WEAPON C60 60mm Fixie Carbon Fiber Wheel (UltraLight).png', 'is_primary' => 1]
         ]
     ],
 

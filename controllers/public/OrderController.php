@@ -1,5 +1,8 @@
 <?php
 
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+
 class OrderController
 {
     public function __construct(private PDO $db) {}
@@ -152,6 +155,23 @@ class OrderController
             exit;
         }
 
+        // Validasi shipping_address
+        $shippingAddress = trim($_POST['shipping_address'] ?? '');
+        if ($shippingAddress === '') {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Alamat pengiriman wajib diisi.'];
+            header('Location: /checkout');
+            exit;
+        }
+
+        // Validasi shipping_cost
+        $shippingCost = filter_input(INPUT_POST, 'shipping_cost', FILTER_VALIDATE_INT);
+        $allowedShippingCosts = [15000, 30000];
+        if (!in_array($shippingCost, $allowedShippingCosts, true)) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Pilihan ongkos kirim tidak valid.'];
+            header('Location: /checkout');
+            exit;
+        }
+
         if (empty($_FILES['proof']) || $_FILES['proof']['error'] !== UPLOAD_ERR_OK) {
             $_SESSION['flash'] = ['type' => 'error', 'message' => 'Bukti transfer wajib diupload.'];
             header('Location: /checkout');
@@ -160,7 +180,7 @@ class OrderController
 
         $productModel = new Product($this->db);
         $items = [];
-        $totalPrice = 0;
+        $subtotalPrice = 0;
 
         foreach ($cart as $productId => $qty) {
             $product = $productModel->find($productId);
@@ -183,36 +203,52 @@ class OrderController
                 'price'      => $product['price'],
             ];
 
-            $totalPrice += $product['price'] * $qty;
+            $subtotalPrice += $product['price'] * $qty;
         }
 
-        $files = [
-            'name'     => [$_FILES['proof']['name']],
-            'type'     => [$_FILES['proof']['type']],
-            'tmp_name' => [$_FILES['proof']['tmp_name']],
-            'error'    => [$_FILES['proof']['error']],
-            'size'     => [$_FILES['proof']['size']],
-        ];
+        // Total price = subtotal produk + ongkos kirim
+        $totalPrice = $subtotalPrice + $shippingCost;
 
-        $uploadResult = uploadImages($files);
+        // Upload bukti transfer ke subfolder payments/
+        $proofDir = UPLOAD_PATH . 'payments/';
+        $ext = strtolower(pathinfo($_FILES['proof']['name'], PATHINFO_EXTENSION));
 
-        if (empty($uploadResult['success'])) {
-            $errorMsg = $uploadResult['errors'][0] ?? 'Gagal mengupload bukti transfer.';
-            $_SESSION['flash'] = ['type' => 'error', 'message' => $errorMsg];
+        if (!in_array($ext, UPLOAD_ALLOWED_EXTENSIONS)) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Tipe file bukti transfer tidak diizinkan (hanya JPG/PNG).'];
             header('Location: /checkout');
             exit;
         }
 
-        $proofImage = $uploadResult['success'][0];
+        if ($_FILES['proof']['size'] > UPLOAD_MAX_SIZE) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Ukuran bukti transfer melebihi 2MB.'];
+            header('Location: /checkout');
+            exit;
+        }
+
+        $proofImage = 'proof_' . $buyerId . '_' . uniqid() . '.' . $ext;
+
+        try {
+            $manager = new ImageManager(new Driver());
+            $image = $manager->decode($_FILES['proof']['tmp_name']);
+            $image->scaleDown(width: UPLOAD_MAX_WIDTH)
+                  ->save($proofDir . $proofImage);
+        } catch (\Exception $e) {
+            error_log('Upload proof error: ' . $e->getMessage());
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Gagal memproses bukti transfer.'];
+            header('Location: /checkout');
+            exit;
+        }
 
         try {
             $this->db->beginTransaction();
 
             $orderModel = new Order($this->db);
             $orderId = $orderModel->create([
-                'buyer_id'    => $buyerId,
-                'total_price' => $totalPrice,
-                'status'      => 'pending',
+                'buyer_id'         => $buyerId,
+                'total_price'      => $totalPrice,
+                'shipping_cost'    => $shippingCost,
+                'shipping_address' => $shippingAddress,
+                'status'           => 'pending',
             ]);
 
             $orderModel->createItems($orderId, $items);
@@ -235,7 +271,10 @@ class OrderController
             $this->db->rollBack();
 
             if (isset($proofImage)) {
-                deleteImage($proofImage);
+                $proofPath = UPLOAD_PATH . 'payments/' . $proofImage;
+                if (file_exists($proofPath)) {
+                    unlink($proofPath);
+                }
             }
 
             error_log('Checkout error: ' . $e->getMessage());

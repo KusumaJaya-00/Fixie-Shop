@@ -50,8 +50,11 @@ CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     buyer_id INT NOT NULL,
     total_price DECIMAL(12,2) NOT NULL,
+    shipping_cost DECIMAL(12,2) NOT NULL DEFAULT 0,
+    shipping_address TEXT NOT NULL,
     status ENUM('pending','paid','shipped','done','cancelled') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (buyer_id) REFERENCES users(id)
 );
 
@@ -71,7 +74,7 @@ CREATE TABLE payments (
     proof_image VARCHAR(255) NOT NULL,
     amount DECIMAL(12,2) NOT NULL,
     status ENUM('unverified','verified') DEFAULT 'unverified',
-    paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    paid_at TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
 

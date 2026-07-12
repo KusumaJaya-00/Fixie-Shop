@@ -45,6 +45,42 @@ $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
         <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
         
         <div class="mb-6">
+            <label for="shipping_address" class="block text-sm font-medium mb-2">
+                Alamat Pengiriman <span class="text-red-600">*</span>
+            </label>
+            <textarea id="shipping_address" name="shipping_address" rows="3" required
+                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-brand"
+                      placeholder="Masukkan alamat lengkap pengiriman"></textarea>
+            <p class="text-xs text-gray-500 mt-1">Alamat harus diisi lengkap (jalan, RT/RW, kelurahan, kecamatan, kota, kode pos).</p>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium mb-2">
+                Pilih Ongkos Kirim <span class="text-red-600">*</span>
+            </label>
+            <div class="space-y-2">
+                <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-300 hover:border-brand cursor-pointer transition">
+                    <input type="radio" name="shipping_cost" value="15000" required
+                           class="w-4 h-4 text-brand focus:ring-2 focus:ring-brand">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">Reguler</p>
+                        <p class="text-xs text-gray-500">3-5 hari kerja</p>
+                    </div>
+                    <p class="text-sm font-semibold text-brand">Rp15.000</p>
+                </label>
+                <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-300 hover:border-brand cursor-pointer transition">
+                    <input type="radio" name="shipping_cost" value="30000" required
+                           class="w-4 h-4 text-brand focus:ring-2 focus:ring-brand">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">Express</p>
+                        <p class="text-xs text-gray-500">1-2 hari kerja</p>
+                    </div>
+                    <p class="text-sm font-semibold text-brand">Rp30.000</p>
+                </label>
+            </div>
+        </div>
+
+        <div class="mb-6">
             <label for="proof" class="block text-sm font-medium mb-2">
                 Bukti Transfer <span class="text-red-600">*</span>
             </label>

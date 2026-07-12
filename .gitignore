@@ -3,5 +3,4 @@
 
 /vendor/
 .env
-config/database.php
-config/mailer.php
+opencode.json

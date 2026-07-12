@@ -24,9 +24,18 @@ function uploadImages(array $files): array
 
     $total = count($files['name']);
     for ($i = 0; $i < $total; $i++) {
-        // Skip file yang gagal diupload
+        // Skip file yang gagal diupload — petakan kode error PHP ke pesan ramah
         if ($files['error'][$i] !== UPLOAD_ERR_OK) {
-            $result['errors'][] = 'File gagal diupload (error #' . $files['error'][$i] . ')';
+            $errorMsg = match ($files['error'][$i]) {
+                UPLOAD_ERR_INI_SIZE   => 'ukuran melebihi batas maksimal PHP',
+                UPLOAD_ERR_FORM_SIZE  => 'ukuran melebihi batas maksimal form',
+                UPLOAD_ERR_PARTIAL    => 'file hanya terupload sebagian',
+                UPLOAD_ERR_NO_FILE    => 'tidak ada file yang dipilih',
+                UPLOAD_ERR_NO_TMP_DIR => 'folder temporary tidak ditemukan',
+                UPLOAD_ERR_CANT_WRITE => 'gagal menulis file ke disk',
+                default               => 'error tidak dikenal',
+            };
+            $result['errors'][] = htmlspecialchars($files['name'][$i]) . ': ' . $errorMsg;
             continue;
         }
 
@@ -45,7 +54,7 @@ function uploadImages(array $files): array
         }
 
         // Generate nama unik & resize pakai Intervention Image
-        $filename = uniqid('img_', true) . '.' . $ext;
+        $filename = 'product_' . uniqid() . '.' . $ext;
         $destPath = UPLOAD_PATH . $filename;
 
         try {

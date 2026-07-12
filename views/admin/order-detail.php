@@ -28,8 +28,10 @@ function detailStatusLabel(string $status): string
 <?php
 // Hitung subtotal tiap item untuk ditampilkan
 $subtotals = [];
+$totalItems = 0;
 foreach ($order['items'] as $item) {
     $subtotals[$item['id']] = $item['qty'] * $item['price'];
+    $totalItems += $subtotals[$item['id']];
 }
 ?>
 
@@ -74,7 +76,7 @@ foreach ($order['items'] as $item) {
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
                                     <?php if (!empty($item['primary_image'])): ?>
-                                        <img src="/<?= htmlspecialchars($item['primary_image']) ?>"
+                                        <img src="/uploads/<?= htmlspecialchars($item['primary_image']) ?>"
                                              alt="<?= htmlspecialchars($item['title']) ?>"
                                              class="w-10 h-10 rounded-lg object-cover shrink-0">
                                     <?php else: ?>
@@ -102,6 +104,18 @@ foreach ($order['items'] as $item) {
                 </tbody>
                 <tfoot class="border-t border-gray-200 bg-gray-50">
                     <tr>
+                        <td colspan="3" class="px-4 py-3 text-right text-gray-700">Subtotal</td>
+                        <td class="px-4 py-3 text-right font-medium text-gray-900">
+                            Rp<?= number_format($totalItems, 0, ',', '.') ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="px-4 py-3 text-right text-gray-700">Ongkos Kirim</td>
+                        <td class="px-4 py-3 text-right font-medium text-gray-900">
+                            Rp<?= number_format($order['shipping_cost'], 0, ',', '.') ?>
+                        </td>
+                    </tr>
+                    <tr class="border-t border-gray-300">
                         <td colspan="3" class="px-4 py-3 text-right font-semibold text-gray-700">Total</td>
                         <td class="px-4 py-3 text-right font-bold text-gray-900">
                             Rp<?= number_format($order['total_price'], 0, ',', '.') ?>
@@ -128,6 +142,12 @@ foreach ($order['items'] as $item) {
                     <dd class="text-gray-900"><?= htmlspecialchars($order['buyer_phone']) ?></dd>
                 </div>
             </dl>
+        </div>
+
+        <!-- Alamat Pengiriman -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
+            <h2 class="font-semibold text-gray-900 mb-3">Alamat Pengiriman</h2>
+            <p class="text-sm text-gray-700 whitespace-pre-line"><?= htmlspecialchars($order['shipping_address']) ?></p>
         </div>
 
     </div>

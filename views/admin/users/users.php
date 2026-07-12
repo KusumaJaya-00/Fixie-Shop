@@ -28,12 +28,12 @@
                             <?= htmlspecialchars($u['role_name']) ?>
                         </span>
                     </td>
-                    <td class="px-4 py-3 flex gap-3">
+                    <td class="px-4 py-3 flex gap-2">
                         <button type="button" data-open-modal="modal-user-edit-<?= (int)$u['id'] ?>"
-                                class="text-brand hover:underline text-xs">Edit</button>
+                                class="rounded-lg border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50">Edit</button>
                         <button type="button"
                                 onclick="openDeleteModal('<?= htmlspecialchars(addslashes($u['name']), ENT_QUOTES) ?>', '/admin/users/delete?id=<?= (int)$u['id'] ?>')"
-                                class="text-red-600 hover:underline text-xs">Hapus</button>
+                                class="rounded-lg border border-red-200 bg-white px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50">Hapus</button>
                     </td>
                 </tr>
             <?php endforeach; ?>

@@ -42,9 +42,14 @@ class AdminProductController
                 $data['sku'] = $this->generateSku();
                 $productId = $productModel->create($data);
 
-                $this->handleImageUpload($productId);
+                $uploadErrors = $this->handleImageUpload($productId);
 
-                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Produk berhasil ditambahkan.'];
+                // Tampilkan sukses produk + peringatan kalau ada foto gagal
+                if ($uploadErrors) {
+                    $_SESSION['flash'] = ['type' => 'error', 'message' => 'Produk berhasil ditambahkan, tapi foto gagal: ' . $uploadErrors];
+                } else {
+                    $_SESSION['flash'] = ['type' => 'success', 'message' => 'Produk berhasil ditambahkan.'];
+                }
                 header('Location: /admin/products');
                 exit;
             }
@@ -85,9 +90,14 @@ class AdminProductController
             $data = $this->validateInput($errors);
             if (empty($errors)) {
                 $productModel->update($id, $data);
-                $this->handleImageUpload($id);
+                $uploadErrors = $this->handleImageUpload($id);
 
-                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Produk berhasil diperbarui.'];
+                // Tampilkan sukses edit + peringatan kalau ada foto gagal
+                if ($uploadErrors) {
+                    $_SESSION['flash'] = ['type' => 'error', 'message' => 'Produk berhasil diperbarui, tapi foto gagal: ' . $uploadErrors];
+                } else {
+                    $_SESSION['flash'] = ['type' => 'success', 'message' => 'Produk berhasil diperbarui.'];
+                }
                 header('Location: /admin/products');
                 exit;
             }
@@ -195,27 +205,25 @@ class AdminProductController
         return $data;
     }
 
-    // Upload & simpan record foto, tampilkan error jika gagal
-    private function handleImageUpload(int $productId): void
+    // Upload & simpan record foto, return string error atau null
+    private function handleImageUpload(int $productId): ?string
     {
         if (empty($_FILES['images']['name'][0])) {
-            return;
+            return null;
         }
 
         $productModel = new Product($this->db);
         $uploadResult = uploadImages($_FILES['images']);
-
-        // Tampilkan error upload ke user
-        if (!empty($uploadResult['errors'])) {
-            $msg = 'Foto gagal diupload: ' . implode('. ', $uploadResult['errors']);
-            $_SESSION['flash'] = ['type' => 'error', 'message' => $msg];
-        }
 
         foreach ($uploadResult['success'] as $filename) {
             $existingImages = $productModel->getImages($productId);
             $isPrimary = empty($existingImages);
             $productModel->addImage($productId, $filename, $isPrimary);
         }
+
+        return !empty($uploadResult['errors'])
+            ? implode('. ', $uploadResult['errors'])
+            : null;
     }
 
     // Generate SKU unik

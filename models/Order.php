@@ -12,13 +12,15 @@ class Order
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO orders (buyer_id, total_price, status)
-             VALUES (:buyer_id, :total_price, :status)'
+            'INSERT INTO orders (buyer_id, total_price, shipping_cost, shipping_address, status)
+             VALUES (:buyer_id, :total_price, :shipping_cost, :shipping_address, :status)'
         );
         $stmt->execute([
-            ':buyer_id'    => $data['buyer_id'],
-            ':total_price' => $data['total_price'],
-            ':status'      => $data['status'] ?? 'pending',
+            ':buyer_id'         => $data['buyer_id'],
+            ':total_price'      => $data['total_price'],
+            ':shipping_cost'    => $data['shipping_cost'] ?? 0,
+            ':shipping_address' => $data['shipping_address'],
+            ':status'           => $data['status'] ?? 'pending',
         ]);
         return (int) $this->db->lastInsertId();
     }
@@ -150,6 +152,31 @@ class Order
     public function countAll(): int
     {
         return (int) $this->db->query('SELECT COUNT(*) FROM orders')->fetchColumn();
+    }
+
+    /**
+     * Jumlah order yang masih pending.
+     */
+    public function countPending(): int
+    {
+        return (int) $this->db->query("SELECT COUNT(*) FROM orders WHERE status = 'pending'")->fetchColumn();
+    }
+
+    /**
+     * Ambil order pending terbaru — untuk dashboard admin.
+     */
+    public function getRecentPending(int $limit = 5): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT o.*, u.name AS buyer_name
+             FROM orders o
+             JOIN users u ON u.id = o.buyer_id
+             WHERE o.status = ?
+             ORDER BY o.created_at DESC
+             LIMIT ?'
+        );
+        $stmt->execute(['pending', $limit]);
+        return $stmt->fetchAll();
     }
 
     /**

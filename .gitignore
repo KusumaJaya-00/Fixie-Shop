@@ -4,3 +4,4 @@
 /vendor/
 .env
 config/database.php
+opencode.json

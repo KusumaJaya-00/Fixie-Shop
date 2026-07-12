@@ -38,15 +38,18 @@ $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
                 </div>
 
                 <!-- Update qty -->
-                <form method="POST" action="/cart/update" class="flex items-center gap-2">
+                <form method="POST" action="/cart/update" class="cart-qty-form flex items-center gap-2">
                     <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
                     <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
-                    <input type="number" name="qty" value="<?= (int) $item['qty'] ?>" min="1" max="<?= (int) $product['stock'] ?>"
-                           class="w-16 rounded-lg border border-gray-300 px-2 py-1 text-sm text-center focus:ring-2 focus:ring-brand">
-                    <button type="submit"
-                            class="rounded-lg border border-gray-300 bg-white px-3 py-1 text-xs text-gray-700 font-medium hover:bg-gray-50 transition">
-                        Update
-                    </button>
+                    <div class="inline-flex items-center rounded-lg border border-gray-300">
+                        <button type="button" aria-label="Kurangi jumlah"
+                                class="qty-dec w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-l-lg transition">−</button>
+                        <input type="text" name="qty" value="<?= (int) $item['qty'] ?>"
+                               data-max="<?= (int) $product['stock'] ?>"
+                               class="qty-val w-10 h-8 text-center text-sm border-x border-gray-300 bg-white" readonly>
+                        <button type="button" aria-label="Tambah jumlah"
+                                class="qty-inc w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-r-lg transition">+</button>
+                    </div>
                 </form>
 
                 <p class="text-sm font-bold text-brand w-28 text-right">Rp<?= number_format($item['subtotal'], 0, ',', '.') ?></p>
@@ -76,3 +79,34 @@ $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
         </a>
     </div>
 <?php endif; ?>
+
+<script>
+document.querySelectorAll('.cart-qty-form').forEach(function(form) {
+    var input = form.querySelector('.qty-val');
+    var dec = form.querySelector('.qty-dec');
+    var inc = form.querySelector('.qty-inc');
+    var max = parseInt(input.dataset.max) || 1;
+
+    function updateBtns() {
+        var v = parseInt(input.value) || 1;
+        dec.disabled = v <= 1;
+        inc.disabled = v >= max;
+        dec.classList.toggle('opacity-50', v <= 1);
+        dec.classList.toggle('cursor-not-allowed', v <= 1);
+        inc.classList.toggle('opacity-50', v >= max);
+        inc.classList.toggle('cursor-not-allowed', v >= max);
+    }
+
+    dec.addEventListener('click', function() {
+        var v = parseInt(input.value) || 1;
+        if (v > 1) { input.value = v - 1; form.submit(); }
+    });
+
+    inc.addEventListener('click', function() {
+        var v = parseInt(input.value) || 1;
+        if (v < max) { input.value = v + 1; form.submit(); }
+    });
+
+    updateBtns();
+});
+</script>

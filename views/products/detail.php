@@ -92,11 +92,18 @@ $outOfStock = (int) $product['stock'] === 0;
                             <?= $outOfStock ? 'disabled' : '' ?>>+</button>
                 </div>
             </div>
-            <button type="submit"
-                    class="inline-flex items-center justify-center rounded-lg px-6 py-2 text-white font-medium transition <?= $outOfStock ? 'bg-gray-400 opacity-50 cursor-not-allowed' : 'bg-brand hover:bg-brand-dark' ?>"
-                    <?= $outOfStock ? 'disabled' : '' ?>>
-                <?= $outOfStock ? 'Stok Habis' : 'Tambah ke Keranjang' ?>
-            </button>
+            <?php if (!checkLogin() && !$outOfStock): ?>
+                <a href="/login?redirect=<?= urlencode('/product?id=' . (int) $product['id']) ?>"
+                   class="inline-flex items-center justify-center rounded-lg px-6 py-2 text-white font-medium transition bg-brand hover:bg-brand-dark">
+                    Login untuk Tambah ke Keranjang
+                </a>
+            <?php else: ?>
+                <button type="submit"
+                        class="inline-flex items-center justify-center rounded-lg px-6 py-2 text-white font-medium transition <?= $outOfStock ? 'bg-gray-400 opacity-50 cursor-not-allowed' : 'bg-brand hover:bg-brand-dark' ?>"
+                        <?= $outOfStock ? 'disabled' : '' ?>>
+                    <?= $outOfStock ? 'Stok Habis' : 'Tambah ke Keranjang' ?>
+                </button>
+            <?php endif; ?>
         </form>
 
         <!-- Deskripsi -->

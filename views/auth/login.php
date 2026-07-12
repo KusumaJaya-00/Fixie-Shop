@@ -3,6 +3,7 @@
 
 <form method="POST" class="max-w-md mx-auto rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
         <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
+        <input type="hidden" name="redirect" value="<?= htmlspecialchars($_GET['redirect'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
     <div>
         <label for="email" class="block text-sm font-medium mb-1">Email <span class="text-red-500">*</span></label>
         <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required

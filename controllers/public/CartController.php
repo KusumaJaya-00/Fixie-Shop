@@ -51,6 +51,12 @@ class CartController
 
     public function add(): void
     {
+        if (!checkLogin()) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Silakan login dulu.'];
+            header('Location: /login');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /');
             exit;
@@ -97,6 +103,12 @@ class CartController
 
     public function update(): void
     {
+        if (!checkLogin()) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Silakan login dulu.'];
+            header('Location: /login');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /cart');
             exit;
@@ -141,6 +153,12 @@ class CartController
 
     public function remove(): void
     {
+        if (!checkLogin()) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Silakan login dulu.'];
+            header('Location: /login');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /cart');
             exit;

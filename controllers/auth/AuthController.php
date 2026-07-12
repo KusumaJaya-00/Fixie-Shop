@@ -100,7 +100,11 @@ class AuthController
                         $_SESSION['user_name']  = $data['name'];
                         $_SESSION['user_email'] = $data['email'];
 
-                        header('Location: /');
+                        $redirect = $_POST['redirect'] ?? $_GET['redirect'] ?? '/';
+                        if (!is_string($redirect) || $redirect === '' || $redirect[0] !== '/' || str_starts_with($redirect, '//')) {
+                            $redirect = '/';
+                        }
+                        header('Location: ' . $redirect);
                         exit;
                     }
 

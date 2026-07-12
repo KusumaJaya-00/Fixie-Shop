@@ -258,6 +258,14 @@ class Product
     }
 
     /**
+     * Hitung total semua produk (untuk dashboard admin).
+     */
+    public function countAll(): int
+    {
+        return (int) $this->db->query('SELECT COUNT(*) FROM products')->fetchColumn();
+    }
+
+    /**
      * Hitung jumlah produk dalam suatu kategori.
      */
     public function countByCategory(int $categoryId): int

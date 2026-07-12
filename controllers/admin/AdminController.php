@@ -8,8 +8,15 @@ class AdminController
     {
         requireAdmin();
 
-        $userModel = new User($this->db);
-        $totalUsers = count($userModel->all());
+        $userModel    = new User($this->db);
+        $productModel = new Product($this->db);
+        $orderModel   = new Order($this->db);
+
+        $totalUsers    = count($userModel->all());
+        $totalProducts = $productModel->countAll();
+        $totalOrders   = $orderModel->countAll();
+        $totalRevenue  = $orderModel->sumRevenue();
+        $pendingOrders = $orderModel->getRecentPending(5);
 
         $title = 'Dashboard';
         ob_start();

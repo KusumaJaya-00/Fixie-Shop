@@ -155,6 +155,31 @@ class Order
     }
 
     /**
+     * Jumlah order yang masih pending.
+     */
+    public function countPending(): int
+    {
+        return (int) $this->db->query("SELECT COUNT(*) FROM orders WHERE status = 'pending'")->fetchColumn();
+    }
+
+    /**
+     * Ambil order pending terbaru — untuk dashboard admin.
+     */
+    public function getRecentPending(int $limit = 5): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT o.*, u.name AS buyer_name
+             FROM orders o
+             JOIN users u ON u.id = o.buyer_id
+             WHERE o.status = ?
+             ORDER BY o.created_at DESC
+             LIMIT ?'
+        );
+        $stmt->execute(['pending', $limit]);
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Total omzet dari order yang sudah paid/shipped/done.
      */
     public function sumRevenue(): float

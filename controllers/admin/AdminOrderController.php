@@ -106,10 +106,14 @@ class AdminOrderController
                 $this->orderModel->reduceStock((int) $item['product_id'], (int) $item['qty']);
             }
 
-            // 4. Generate & kirim invoice (diisi di sub-task 4 & 5)
-            generateAndSendInvoice($id);
-
-            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Pembayaran berhasil diverifikasi. Status order diubah ke Paid.'];
+            // 4. Generate invoice PDF (sub-task 4)
+            try {
+                generateInvoicePdf($id);
+                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Pembayaran berhasil diverifikasi. Status order diubah ke Paid.'];
+            } catch (Exception $e) {
+                error_log('Generate invoice PDF error for order ID ' . $id . ': ' . $e->getMessage());
+                $_SESSION['flash'] = ['type' => 'warning', 'message' => 'Pembayaran terverifikasi, tapi invoice gagal dibuat, coba generate ulang'];
+            }
         } catch (Exception $e) {
             error_log('Verify payment error: ' . $e->getMessage());
             $_SESSION['flash'] = ['type' => 'error', 'message' => 'Terjadi kesalahan saat memverifikasi pembayaran.'];

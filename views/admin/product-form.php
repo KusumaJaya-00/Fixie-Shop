@@ -94,8 +94,9 @@
         <div>
             <label class="block text-sm font-medium mb-1">Foto Produk</label>
             <p class="text-xs text-gray-500 mb-2">Format: JPG/PNG. Maks 2MB per file. Bisa pilih banyak file sekaligus.</p>
-            <input type="file" name="images[]" multiple accept=".jpg,.jpeg,.png"
+            <input type="file" name="images[]" multiple accept=".jpg,.jpeg,.png" id="image-input"
                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-1 file:text-white file:text-sm file:font-medium hover:file:bg-brand-dark">
+            <div id="upload-errors" class="mt-1 text-sm text-red-600"></div>
         </div>
 
         <?php if (isset($product) && !empty($images)): ?>
@@ -134,3 +135,21 @@
         </div>
     </form>
 </div>
+
+<script>
+// Validasi ukuran file client-side (server-side tetap jalan sebagai backup)
+document.getElementById('image-input').addEventListener('change', function() {
+    var errors = document.getElementById('upload-errors');
+    var messages = [];
+    var maxSize = 2 * 1024 * 1024;
+
+    for (var i = 0; i < this.files.length; i++) {
+        var file = this.files[i];
+        if (file.size > maxSize) {
+            messages.push(file.name + ': ukuran melebihi 2MB');
+        }
+    }
+
+    errors.textContent = messages.join('. ');
+});
+</script>

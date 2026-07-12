@@ -75,27 +75,51 @@ function trackingSteps(string $status): array
                 </span>
             </div>
 
-            <!-- Daftar item singkat -->
+            <!-- Daftar item dengan gambar -->
             <div class="px-4 py-3">
                 <?php if (!empty($order['items'])): ?>
-                    <ul class="space-y-1 text-sm text-gray-700">
+                    <div class="space-y-3">
                         <?php 
                         $subtotalItems = 0;
                         foreach ($order['items'] as $item): 
                             $itemTotal = (float) $item['price'] * (int) $item['qty'];
                             $subtotalItems += $itemTotal;
+                            $imgSrc = !empty($item['primary_image'])
+                                ? '/uploads/' . htmlspecialchars($item['primary_image'])
+                                : '/assets/img/no-image.png';
                         ?>
-                            <li class="flex items-center justify-between">
-                                <span>
-                                    <?= htmlspecialchars($item['title']) ?>
-                                    <span class="text-gray-400">× <?= (int) $item['qty'] ?></span>
-                                </span>
-                                <span class="text-gray-500">
-                                    <?= htmlspecialchars(formatRupiah($itemTotal)) ?>
-                                </span>
-                            </li>
+                            <div class="flex items-center gap-3 pb-3 border-b border-gray-100 last:border-0">
+                                <!-- Gambar Produk -->
+                                <img src="<?= $imgSrc ?>" 
+                                     alt="<?= htmlspecialchars($item['title']) ?>"
+                                     class="w-16 h-16 rounded-lg object-cover bg-gray-100 flex-shrink-0" 
+                                     loading="lazy"
+                                     onerror="this.src='/assets/img/no-image.png'">
+                                
+                                <!-- Info Produk -->
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-gray-900 truncate">
+                                        <?= htmlspecialchars($item['title']) ?>
+                                    </p>
+                                    <?php if (!empty($item['sku'])): ?>
+                                        <p class="text-xs text-gray-400 mt-0.5">SKU: <?= htmlspecialchars($item['sku']) ?></p>
+                                    <?php endif; ?>
+                                    <div class="flex items-center gap-3 mt-1 text-xs text-gray-600">
+                                        <span><?= htmlspecialchars(formatRupiah((float) $item['price'])) ?></span>
+                                        <span class="text-gray-400">×</span>
+                                        <span><?= (int) $item['qty'] ?></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Subtotal -->
+                                <div class="text-right flex-shrink-0">
+                                    <p class="text-sm font-semibold text-gray-900">
+                                        <?= htmlspecialchars(formatRupiah($itemTotal)) ?>
+                                    </p>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
-                    </ul>
+                    </div>
                 <?php else: ?>
                     <p class="text-sm text-gray-400">Tidak ada item.</p>
                     <?php $subtotalItems = 0; ?>

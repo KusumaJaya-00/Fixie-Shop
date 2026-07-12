@@ -5,3 +5,4 @@
 .env
 config/database.php
 opencode.json
+config/mailer.php

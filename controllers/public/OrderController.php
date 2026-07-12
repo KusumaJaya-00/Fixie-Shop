@@ -56,6 +56,75 @@ class OrderController
         require __DIR__ . '/../../views/components/public-layout.php';
     }
 
+    /** Halaman daftar pesanan milik buyer yang sedang login. */
+    public function myOrders(): void
+    {
+        if (!checkLogin()) {
+            header('Location: /login');
+            exit;
+        }
+
+        $buyerId    = (int) $_SESSION['user_id'];
+        $orderModel = new Order($this->db);
+        $orders     = $orderModel->allByBuyer($buyerId);
+
+        // Ambil item untuk setiap order
+        foreach ($orders as &$order) {
+            $full          = $orderModel->findWithItems((int) $order['id']);
+            $order['items'] = $full['items'] ?? [];
+        }
+        unset($order);
+
+        $title   = 'Pesanan Saya';
+        ob_start();
+        require __DIR__ . '/../../views/orders/my-orders.php';
+        $content = ob_get_clean();
+        require __DIR__ . '/../../views/components/public-layout.php';
+    }
+
+    /** Download invoice PDF untuk satu order milik buyer yang login. */
+    public function downloadInvoice(): void
+    {
+        if (!checkLogin()) {
+            header('Location: /login');
+            exit;
+        }
+
+        $orderId    = (int) ($_GET['id'] ?? 0);
+        $orderModel = new Order($this->db);
+        $order      = $orderModel->find($orderId);
+
+        // Cek order ada & milik buyer yang login
+        if (!$order || (int) $order['buyer_id'] !== (int) $_SESSION['user_id']) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Pesanan tidak ditemukan.'];
+            header('Location: /my-orders');
+            exit;
+        }
+
+        // Invoice hanya tersedia setelah paid
+        $invoiceStatuses = ['paid', 'shipped', 'done'];
+        if (!in_array($order['status'], $invoiceStatuses, true)) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Invoice belum tersedia untuk pesanan ini.'];
+            header('Location: /my-orders');
+            exit;
+        }
+
+        $filePath = __DIR__ . '/../../public/invoices/inv-' . $orderId . '.pdf';
+
+        if (!file_exists($filePath)) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Invoice belum tersedia, silakan hubungi admin.'];
+            header('Location: /my-orders');
+            exit;
+        }
+
+        // Kirim file ke browser sebagai download
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="inv-' . $orderId . '.pdf"');
+        header('Content-Length: ' . filesize($filePath));
+        readfile($filePath);
+        exit;
+    }
+
     public function process(): void
     {
         if (!checkLogin()) {

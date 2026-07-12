@@ -33,6 +33,12 @@ if ($uri === '/' || $uri === '/products') {
     } else {
         $controller->checkoutPage();
     }
+} elseif ($uri === '/my-orders') {
+    $controller = new OrderController($pdo);
+    $controller->myOrders();
+} elseif ($uri === '/invoice/download') {
+    $controller = new OrderController($pdo);
+    $controller->downloadInvoice();
 } elseif ($uri === '/register') {
     $controller = new AuthController($pdo);
     $controller->register();

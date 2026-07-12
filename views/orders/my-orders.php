@@ -79,27 +79,50 @@ function trackingSteps(string $status): array
             <div class="px-4 py-3">
                 <?php if (!empty($order['items'])): ?>
                     <ul class="space-y-1 text-sm text-gray-700">
-                        <?php foreach ($order['items'] as $item): ?>
+                        <?php 
+                        $subtotalItems = 0;
+                        foreach ($order['items'] as $item): 
+                            $itemTotal = (float) $item['price'] * (int) $item['qty'];
+                            $subtotalItems += $itemTotal;
+                        ?>
                             <li class="flex items-center justify-between">
                                 <span>
                                     <?= htmlspecialchars($item['title']) ?>
                                     <span class="text-gray-400">× <?= (int) $item['qty'] ?></span>
                                 </span>
                                 <span class="text-gray-500">
-                                    <?= htmlspecialchars(formatRupiah((float) $item['price'] * (int) $item['qty'])) ?>
+                                    <?= htmlspecialchars(formatRupiah($itemTotal)) ?>
                                 </span>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                 <?php else: ?>
                     <p class="text-sm text-gray-400">Tidak ada item.</p>
+                    <?php $subtotalItems = 0; ?>
                 <?php endif; ?>
 
-                <!-- Total -->
-                <div class="mt-3 flex justify-end border-t border-gray-100 pt-2">
-                    <span class="text-sm font-semibold text-gray-900">
-                        Total: <?= htmlspecialchars(formatRupiah((float) $order['total_price'])) ?>
-                    </span>
+                <!-- Alamat Pengiriman -->
+                <?php if (!empty($order['shipping_address'])): ?>
+                    <div class="mt-3 rounded-lg bg-gray-50 px-3 py-2">
+                        <p class="text-xs font-medium text-gray-600 mb-1">Dikirim ke:</p>
+                        <p class="text-xs text-gray-700 line-clamp-2"><?= htmlspecialchars($order['shipping_address']) ?></p>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Rincian Harga -->
+                <div class="mt-3 space-y-1 text-sm">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Subtotal Produk</span>
+                        <span><?= htmlspecialchars(formatRupiah($subtotalItems)) ?></span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Ongkos Kirim</span>
+                        <span><?= htmlspecialchars(formatRupiah((float) $order['shipping_cost'])) ?></span>
+                    </div>
+                    <div class="flex justify-between border-t border-gray-200 pt-2 font-bold text-gray-900">
+                        <span>Total</span>
+                        <span class="text-brand"><?= htmlspecialchars(formatRupiah((float) $order['total_price'])) ?></span>
+                    </div>
                 </div>
             </div>
 

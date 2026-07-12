@@ -12,13 +12,15 @@ class Order
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO orders (buyer_id, total_price, status)
-             VALUES (:buyer_id, :total_price, :status)'
+            'INSERT INTO orders (buyer_id, total_price, shipping_cost, shipping_address, status)
+             VALUES (:buyer_id, :total_price, :shipping_cost, :shipping_address, :status)'
         );
         $stmt->execute([
-            ':buyer_id'    => $data['buyer_id'],
-            ':total_price' => $data['total_price'],
-            ':status'      => $data['status'] ?? 'pending',
+            ':buyer_id'         => $data['buyer_id'],
+            ':total_price'      => $data['total_price'],
+            ':shipping_cost'    => $data['shipping_cost'] ?? 0,
+            ':shipping_address' => $data['shipping_address'],
+            ':status'           => $data['status'] ?? 'pending',
         ]);
         return (int) $this->db->lastInsertId();
     }

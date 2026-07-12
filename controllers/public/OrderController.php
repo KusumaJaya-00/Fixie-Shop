@@ -152,6 +152,23 @@ class OrderController
             exit;
         }
 
+        // Validasi shipping_address
+        $shippingAddress = trim($_POST['shipping_address'] ?? '');
+        if ($shippingAddress === '') {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Alamat pengiriman wajib diisi.'];
+            header('Location: /checkout');
+            exit;
+        }
+
+        // Validasi shipping_cost
+        $shippingCost = filter_input(INPUT_POST, 'shipping_cost', FILTER_VALIDATE_INT);
+        $allowedShippingCosts = [15000, 30000];
+        if (!in_array($shippingCost, $allowedShippingCosts, true)) {
+            $_SESSION['flash'] = ['type' => 'error', 'message' => 'Pilihan ongkos kirim tidak valid.'];
+            header('Location: /checkout');
+            exit;
+        }
+
         if (empty($_FILES['proof']) || $_FILES['proof']['error'] !== UPLOAD_ERR_OK) {
             $_SESSION['flash'] = ['type' => 'error', 'message' => 'Bukti transfer wajib diupload.'];
             header('Location: /checkout');
@@ -160,7 +177,7 @@ class OrderController
 
         $productModel = new Product($this->db);
         $items = [];
-        $totalPrice = 0;
+        $subtotalPrice = 0;
 
         foreach ($cart as $productId => $qty) {
             $product = $productModel->find($productId);
@@ -183,8 +200,11 @@ class OrderController
                 'price'      => $product['price'],
             ];
 
-            $totalPrice += $product['price'] * $qty;
+            $subtotalPrice += $product['price'] * $qty;
         }
+
+        // Total price = subtotal produk + ongkos kirim
+        $totalPrice = $subtotalPrice + $shippingCost;
 
         $files = [
             'name'     => [$_FILES['proof']['name']],
@@ -210,9 +230,11 @@ class OrderController
 
             $orderModel = new Order($this->db);
             $orderId = $orderModel->create([
-                'buyer_id'    => $buyerId,
-                'total_price' => $totalPrice,
-                'status'      => 'pending',
+                'buyer_id'         => $buyerId,
+                'total_price'      => $totalPrice,
+                'shipping_cost'    => $shippingCost,
+                'shipping_address' => $shippingAddress,
+                'status'           => 'pending',
             ]);
 
             $orderModel->createItems($orderId, $items);

@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans min-h-screen flex flex-col">
-    <nav class="bg-slate-900 text-white">
+    <nav class="bg-slate-900/95 backdrop-blur text-white sticky top-0 z-50 shadow-lg">
         <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
             <a href="/" class="text-lg font-bold">Fixie Shop</a>
             <div class="flex items-center gap-4 text-sm">

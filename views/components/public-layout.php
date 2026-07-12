@@ -31,6 +31,7 @@
                         </button>
                         <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-44 rounded-lg border border-gray-200 bg-white shadow-lg z-50 py-1 text-sm text-gray-700">
                             <a href="/profile" class="block px-4 py-2 hover:bg-gray-50">Profil</a>
+                            <a href="/my-orders" class="block px-4 py-2 hover:bg-gray-50">Pesanan Saya</a>
                             <?php if (isAdmin()): ?>
                                 <a href="/admin" class="block px-4 py-2 hover:bg-gray-50">Dashboard</a>
                             <?php endif; ?>

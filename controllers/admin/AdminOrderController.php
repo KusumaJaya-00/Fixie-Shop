@@ -106,24 +106,10 @@ class AdminOrderController
                 $this->orderModel->reduceStock((int) $item['product_id'], (int) $item['qty']);
             }
 
-            // 4. Generate invoice PDF & kirim email (sub-task 4 & 5)
-            $pdfPath = '';
-            try {
-                $pdfPath = generateInvoicePdf($id);
-            } catch (Exception $e) {
-                error_log('Generate invoice PDF error for order ID ' . $id . ': ' . $e->getMessage());
-                $_SESSION['flash'] = ['type' => 'warning', 'message' => 'Pembayaran terverifikasi, tapi invoice gagal dibuat, coba generate ulang'];
-            }
+            // 4. Generate & kirim invoice (diisi di sub-task 4 & 5)
+            generateAndSendInvoice($id);
 
-            if ($pdfPath !== '') {
-                try {
-                    sendInvoiceEmail($id, $pdfPath);
-                    $_SESSION['flash'] = ['type' => 'success', 'message' => 'Pembayaran berhasil diverifikasi. Status order diubah ke Paid.'];
-                } catch (Exception $e) {
-                    error_log('Send invoice email error for order ID ' . $id . ': ' . $e->getMessage());
-                    $_SESSION['flash'] = ['type' => 'warning', 'message' => 'Pembayaran terverifikasi, invoice berhasil dibuat, tetapi gagal mengirim email invoice ke pembeli.'];
-                }
-            }
+            $_SESSION['flash'] = ['type' => 'success', 'message' => 'Pembayaran berhasil diverifikasi. Status order diubah ke Paid.'];
         } catch (Exception $e) {
             error_log('Verify payment error: ' . $e->getMessage());
             $_SESSION['flash'] = ['type' => 'error', 'message' => 'Terjadi kesalahan saat memverifikasi pembayaran.'];

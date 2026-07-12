@@ -78,10 +78,19 @@ $outOfStock = (int) $product['stock'] === 0;
             <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
             <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
             <div>
-                <label for="qty" class="block text-sm font-medium mb-1">Jumlah</label>
-                <input type="number" id="qty" name="qty" value="1" min="1" max="<?= (int) $product['stock'] ?>"
-                       class="w-20 rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-brand text-sm"
-                       <?= $outOfStock ? 'disabled' : '' ?>>
+                <label class="block text-sm font-medium mb-1">Jumlah</label>
+                <div class="inline-flex items-center rounded-lg border border-gray-300">
+                    <button type="button" id="qty-dec" aria-label="Kurangi jumlah"
+                            class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-l-lg transition <?= $outOfStock ? 'opacity-50 cursor-not-allowed' : '' ?>"
+                            <?= $outOfStock ? 'disabled' : '' ?>>−</button>
+                    <input type="text" id="qty" name="qty" value="1" readonly
+                           data-max="<?= (int) $product['stock'] ?>"
+                           class="w-10 h-8 text-center text-sm border-x border-gray-300 bg-white"
+                           <?= $outOfStock ? 'disabled' : '' ?>>
+                    <button type="button" id="qty-inc" aria-label="Tambah jumlah"
+                            class="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-r-lg transition <?= $outOfStock ? 'opacity-50 cursor-not-allowed' : '' ?>"
+                            <?= $outOfStock ? 'disabled' : '' ?>>+</button>
+                </div>
             </div>
             <button type="submit"
                     class="inline-flex items-center justify-center rounded-lg px-6 py-2 text-white font-medium transition <?= $outOfStock ? 'bg-gray-400 opacity-50 cursor-not-allowed' : 'bg-brand hover:bg-brand-dark' ?>"
@@ -112,4 +121,34 @@ document.querySelectorAll('.gallery-thumb').forEach(function(btn) {
         this.classList.replace('border-gray-200', 'border-brand');
     });
 });
+
+(function() {
+    var input = document.getElementById('qty');
+    var dec = document.getElementById('qty-dec');
+    var inc = document.getElementById('qty-inc');
+    if (!input || !dec || !inc) return;
+    var max = parseInt(input.dataset.max) || 1;
+
+    function update() {
+        var v = parseInt(input.value) || 1;
+        dec.disabled = v <= 1;
+        inc.disabled = v >= max;
+        dec.classList.toggle('opacity-50', v <= 1);
+        dec.classList.toggle('cursor-not-allowed', v <= 1);
+        inc.classList.toggle('opacity-50', v >= max);
+        inc.classList.toggle('cursor-not-allowed', v >= max);
+    }
+
+    dec.addEventListener('click', function() {
+        var v = parseInt(input.value) || 1;
+        if (v > 1) { input.value = v - 1; update(); }
+    });
+
+    inc.addEventListener('click', function() {
+        var v = parseInt(input.value) || 1;
+        if (v < max) { input.value = v + 1; update(); }
+    });
+
+    update();
+})();
 </script>

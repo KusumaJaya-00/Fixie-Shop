@@ -1,15 +1,18 @@
 <?php
 
+// Controller untuk halaman katalog & detail produk yang dilihat pembeli (bukan admin).
 class ProductController
 {
     public function __construct(private PDO $db) {}
 
+    // Tampilkan katalog produk + handle filter/search/sort dari query string
     public function index(): void
     {
         $productModel  = new Product($this->db);
         $categoryModel = new Category($this->db);
 
         // Ambil filter dari query string
+        // Hanya masukin key yang beneran diisi user, biar query di Product::all() gak kena filter kosong
         $filters = [];
         $filterKeys = ['category_id', 'brand', 'color', 'frame_size', 'price_min', 'price_max', 'search', 'sort'];
         foreach ($filterKeys as $key) {
@@ -32,6 +35,7 @@ class ProductController
         require __DIR__ . '/../../views/components/public-layout.php';
     }
 
+    // Tampilkan detail 1 produk berdasarkan id di query string
     public function show(): void
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -52,6 +56,7 @@ class ProductController
         $productModel = new Product($this->db);
         $product = $productModel->find($id);
 
+        // Produk nonaktif dianggap tidak ada buat buyer, walaupun row-nya masih ada di DB
         if (!$product || (int) $product['is_active'] === 0) {
             http_response_code(404);
             $title = 'Produk Tidak Ditemukan';

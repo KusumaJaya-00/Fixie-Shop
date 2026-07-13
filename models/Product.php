@@ -15,6 +15,9 @@ class Product
                 LEFT JOIN product_images pi ON pi.product_id = p.id AND pi.is_primary = 1
                 WHERE p.is_active = 1';
 
+        // Query dibangun dinamis: kondisi WHERE cuma ditambah kalau filter itu benar-benar dipakai user.
+        // Semua nilai tetap lewat parameter binding (:category_id dst), bukan digabung langsung ke $sql,
+        // biar aman dari SQL injection walaupun jumlah/kombinasi filternya berubah-ubah.
         $conditions = [];
         $params = [];
 
@@ -57,6 +60,8 @@ class Product
             $sql .= ' AND ' . implode(' AND ', $conditions);
         }
 
+        // Sort dipilih dari whitelist (bukan langsung dari input user) supaya nama kolom/arah ORDER BY
+        // gak bisa disuntik lewat query string sort=... (kolom di ORDER BY gak bisa di-bind pakai parameter PDO)
         $allowedSort = [
             'terbaru'  => 'p.created_at DESC',
             'termurah' => 'p.price ASC',
@@ -72,6 +77,7 @@ class Product
         return $stmt->fetchAll();
     }
 
+    // Daftar brand unik buat isi dropdown filter brand di katalog
     public function getDistinctBrands(): array
     {
         $stmt = $this->db->prepare(
@@ -81,6 +87,7 @@ class Product
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
+    // Daftar warna unik buat isi dropdown filter warna di katalog
     public function getDistinctColors(): array
     {
         $stmt = $this->db->prepare(
@@ -90,6 +97,7 @@ class Product
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
+    // Daftar frame size unik buat isi dropdown filter ukuran di katalog
     public function getDistinctFrameSizes(): array
     {
         $stmt = $this->db->prepare(

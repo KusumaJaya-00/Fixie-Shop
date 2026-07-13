@@ -1,4 +1,6 @@
 <?php
+// View halaman keranjang: list item cart + total + tombol checkout.
+// Data ($items, $total) sudah disiapkan & disinkronkan ke stok terbaru oleh CartController::index().
 $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 ?>
 
@@ -37,7 +39,8 @@ $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
                     <p class="text-sm text-gray-500 mt-0.5">Rp<?= number_format($product['price'], 0, ',', '.') ?></p>
                 </div>
 
-                <!-- Update qty -->
+                <!-- Update qty: tombol +/- ubah value lalu langsung submit form (lihat script di bawah),
+                     jadi tiap klik itu request POST baru ke /cart/update -->
                 <form method="POST" action="/cart/update" class="cart-qty-form flex items-center gap-2">
                     <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
                     <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
@@ -54,7 +57,7 @@ $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 
                 <p class="text-sm font-bold text-brand w-28 text-right">Rp<?= number_format($item['subtotal'], 0, ',', '.') ?></p>
 
-                <!-- Hapus -->
+                <!-- Hapus: minta konfirmasi dulu biar gak kehapus gara-gara salah klik -->
                 <form method="POST" action="/cart/remove"
                       onsubmit="return confirm('Hapus produk ini dari keranjang?')">
                     <input type="hidden" name="_csrf_token" value="<?= generateCsrfToken() ?>">
@@ -81,6 +84,8 @@ $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 <?php endif; ?>
 
 <script>
+// Tiap form qty per item ditangani sendiri-sendiri, klik +/- langsung form.submit()
+// (reload halaman) supaya subtotal & total di server selalu ke-update pakai harga/stok terbaru
 document.querySelectorAll('.cart-qty-form').forEach(function(form) {
     var input = form.querySelector('.qty-val');
     var dec = form.querySelector('.qty-dec');

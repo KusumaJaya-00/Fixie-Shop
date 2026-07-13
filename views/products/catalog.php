@@ -1,3 +1,5 @@
+<?php /* View katalog produk: form search/filter/sort + grid product-card. Semua submit pakai method GET biar filter kebawa di URL (bisa di-share/bookmark) dan halaman ini murni nampilin data dari $products, $filters dll yang disiapkan ProductController::index(). */ ?>
+
 <div class="flex items-center justify-between mb-6">
     <h1 class="text-2xl font-bold">Katalog Produk</h1>
 </div>
@@ -19,6 +21,8 @@
     </div>
 
     <!-- Filter Row -->
+    <!-- Tiap input/select nge-cek $filters buat nentuin value/selected, jadi setelah submit form-nya
+         gak keriset ke kosong lagi — pilihan filter yang aktif tetap kelihatan -->
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-3">
         <select name="category_id" class="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:outline-none focus:bg-white">
             <option value="">Semua Kategori</option>
@@ -81,6 +85,7 @@
         <p class="text-sm text-gray-500">Menampilkan <?= count($products) ?> produk</p>
         <div class="flex items-center gap-2">
             <label class="text-sm text-gray-500 hidden sm:inline">Urutkan:</label>
+            <!-- Ganti sort langsung submit form (gak perlu klik tombol lagi) biar filter lain yang udah diisi ikut kebawa -->
             <select name="sort" onchange="this.form.submit()" class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm focus:ring-2 focus:ring-brand focus:outline-none">
                 <option value="terbaru" <?= ($filters['sort'] ?? 'terbaru') === 'terbaru' ? 'selected' : '' ?>>Terbaru</option>
                 <option value="termurah" <?= ($filters['sort'] ?? '') === 'termurah' ? 'selected' : '' ?>>Termurah</option>

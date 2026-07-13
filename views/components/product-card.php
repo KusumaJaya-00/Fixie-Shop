@@ -3,6 +3,7 @@
  * Komponen card produk — reusable.
  * Variabel yang harus tersedia: $product (array dari query Product::all)
  */
+// Produk bisa aja belum punya foto sama sekali (belum diupload admin), makanya fallback ke gambar placeholder
 $img = $product['primary_image'] ?? null;
 $imgSrc = $img ? '/uploads/' . htmlspecialchars($img, ENT_QUOTES, 'UTF-8') : '/assets/img/no-image.png';
 $outOfStock = (int) $product['stock'] === 0;

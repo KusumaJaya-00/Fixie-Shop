@@ -1,4 +1,6 @@
 <?php
+// View halaman checkout: ringkasan pesanan (read-only) + form alamat, ongkir, dan upload bukti transfer.
+// Data ($items, $total) disiapkan OrderController::checkoutPage(); submit-nya diproses di OrderController::process().
 $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 ?>
 
@@ -58,6 +60,8 @@ $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
             <label class="block text-sm font-medium mb-2">
                 Pilih Ongkos Kirim <span class="text-red-600">*</span>
             </label>
+            <!-- Value di sini (15000/30000) harus sinkron sama whitelist $allowedShippingCosts
+                 di OrderController::process(), soalnya server yang nentuin valid/tidaknya, bukan form ini -->
             <div class="space-y-2">
                 <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-300 hover:border-brand cursor-pointer transition">
                     <input type="radio" name="shipping_cost" value="15000" required
@@ -103,6 +107,8 @@ $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 </div>
 
 <script>
+// Disable tombol submit begitu diklik, biar buyer gak bisa double-klik dan
+// bikin order/upload bukti transfer keproses dua kali selagi nunggu response server
 document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;

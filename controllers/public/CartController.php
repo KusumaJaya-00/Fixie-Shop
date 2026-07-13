@@ -1,9 +1,12 @@
 <?php
 
+// Controller keranjang belanja: lihat isi cart, tambah, ubah qty, hapus item.
+// Cart disimpan di session (bukan tabel DB), formatnya [product_id => qty].
 class CartController
 {
     public function __construct(private PDO $db) {}
 
+    // Tampilkan isi keranjang, sekalian sinkronin ulang tiap item ke data produk terbaru
     public function index(): void
     {
         if (!checkLogin()) {
@@ -18,6 +21,7 @@ class CartController
 
         foreach ($cart as $productId => $qty) {
             $product = $productModel->find($productId);
+            // Produk sudah dihapus/dinonaktifkan admin sejak dimasukkan ke cart -> buang dari session
             if (!$product || (int) $product['is_active'] === 0) {
                 unset($_SESSION['cart'][$productId]);
                 continue;
@@ -26,6 +30,8 @@ class CartController
             $images = $productModel->getImages($productId);
             $primaryImage = $images[0]['image_path'] ?? null;
 
+            // Stok bisa berkurang (dibeli orang lain) setelah item masuk cart, jadi qty di session
+            // perlu disesuaikan lagi ke stok terkini biar gak nampilin jumlah yang gak valid
             if ($qty > (int) $product['stock']) {
                 $qty = (int) $product['stock'];
                 $_SESSION['cart'][$productId] = $qty;
@@ -49,8 +55,10 @@ class CartController
         require __DIR__ . '/../../views/components/public-layout.php';
     }
 
+    // Tambah 1 produk ke keranjang (atau nambahin qty kalau produknya udah ada di cart)
     public function add(): void
     {
+        // Wajib login sebelum bisa belanja, soalnya cart nantinya nempel ke checkout & order milik user
         if (!checkLogin()) {
             $_SESSION['flash'] = ['type' => 'error', 'message' => 'Silakan login dulu.'];
             header('Location: /login');
@@ -89,6 +97,7 @@ class CartController
         $currentQty = $_SESSION['cart'][$productId] ?? 0;
         $newQty = $currentQty + $qty;
 
+        // Cek stok terbaru dari DB, jangan percaya angka yang mungkin udah nyangkut di session
         if ($newQty > (int) $product['stock']) {
             $_SESSION['flash'] = ['type' => 'error', 'message' => 'Jumlah melebihi stok tersedia (' . (int) $product['stock'] . ').'];
             header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/'));
@@ -101,6 +110,7 @@ class CartController
         exit;
     }
 
+    // Ubah qty item yang sudah ada di keranjang (dipanggil dari tombol +/- di halaman cart)
     public function update(): void
     {
         if (!checkLogin()) {
@@ -151,6 +161,7 @@ class CartController
         exit;
     }
 
+    // Hapus 1 item dari keranjang
     public function remove(): void
     {
         if (!checkLogin()) {

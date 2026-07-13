@@ -3,10 +3,12 @@
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 
+// Controller checkout & pesanan buyer: halaman checkout, proses order, riwayat pesanan, download invoice.
 class OrderController
 {
     public function __construct(private PDO $db) {}
 
+    // Tampilkan ringkasan checkout (isi cart + total) sebelum buyer upload bukti transfer
     public function checkoutPage(): void
     {
         if (!checkLogin()) {
@@ -25,6 +27,7 @@ class OrderController
         $items = [];
         $total = 0;
 
+        // Bangun ulang ringkasan dari data produk terbaru di DB, bukan cuma pakai qty di session
         foreach ($cart as $productId => $qty) {
             $product = $productModel->find($productId);
             if (!$product || (int) $product['is_active'] === 0) {
@@ -128,6 +131,7 @@ class OrderController
         exit;
     }
 
+    // Proses submit checkout: validasi ulang stok, upload bukti transfer, simpan order+item+payment
     public function process(): void
     {
         if (!checkLogin()) {
@@ -164,6 +168,7 @@ class OrderController
         }
 
         // Validasi shipping_cost
+        // Dicocokkan ke daftar ongkir yang valid, biar nilai shipping_cost gak bisa diakalin lewat request manual
         $shippingCost = filter_input(INPUT_POST, 'shipping_cost', FILTER_VALIDATE_INT);
         $allowedShippingCosts = [15000, 30000];
         if (!in_array($shippingCost, $allowedShippingCosts, true)) {
@@ -182,6 +187,8 @@ class OrderController
         $items = [];
         $subtotalPrice = 0;
 
+        // Stok & harga di session bisa basi (produk laku duluan / harga diubah admin), makanya
+        // divalidasi & diambil ulang dari DB di sini, jangan cuma percaya data yang ada di cart session
         foreach ($cart as $productId => $qty) {
             $product = $productModel->find($productId);
 
@@ -197,6 +204,9 @@ class OrderController
                 exit;
             }
 
+            // Harga diambil dari DB saat checkout ini juga bakal dipakai sebagai snapshot
+            // di order_items nanti, supaya kalau harga produk berubah di kemudian hari,
+            // riwayat pesanan tetap nyimpen harga yang beneran dibayar buyer
             $items[] = [
                 'product_id' => $productId,
                 'qty'        => $qty,
@@ -239,6 +249,9 @@ class OrderController
             exit;
         }
 
+        // Insert order + order_items + payment harus sukses semua atau gagal semua,
+        // makanya dibungkus transaction — kalau salah satu query gagal di tengah jalan,
+        // gak boleh ada order "setengah jadi" (misal order kebuat tapi item-nya kosong)
         try {
             $this->db->beginTransaction();
 
@@ -268,6 +281,8 @@ class OrderController
             exit;
 
         } catch (PDOException $e) {
+            // Query gagal -> batalkan semua perubahan DB, dan hapus juga file bukti transfer
+            // yang sudah kadung ke-upload biar gak jadi file sampah tanpa order terkait
             $this->db->rollBack();
 
             if (isset($proofImage)) {

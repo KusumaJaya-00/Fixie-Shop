@@ -1,4 +1,6 @@
 <?php
+// View detail produk: galeri foto, spesifikasi, dan form tambah ke keranjang.
+// Data ($product, $images) disiapkan oleh ProductController::show().
 $e = fn(string $v) => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
 $outOfStock = (int) $product['stock'] === 0;
 ?>
@@ -92,6 +94,8 @@ $outOfStock = (int) $product['stock'] === 0;
                             <?= $outOfStock ? 'disabled' : '' ?>>+</button>
                 </div>
             </div>
+            <?php // Kalau belum login, tombol diganti link ke /login (bukan submit form) — soalnya
+                  // CartController::add() bakal nolak request tanpa login, mending diarahin login dulu ?>
             <?php if (!checkLogin() && !$outOfStock): ?>
                 <a href="/login?redirect=<?= urlencode('/product?id=' . (int) $product['id']) ?>"
                    class="inline-flex items-center justify-center rounded-lg px-6 py-2 text-white font-medium transition bg-brand hover:bg-brand-dark">
@@ -130,6 +134,8 @@ document.querySelectorAll('.gallery-thumb').forEach(function(btn) {
 });
 
 (function() {
+    // Stepper qty ini cuma buat UX (biar gak bisa pilih lebih dari stok lewat tombol +/-);
+    // validasi stok yang beneran tetap dicek ulang di server saat submit ke CartController::add()
     var input = document.getElementById('qty');
     var dec = document.getElementById('qty-dec');
     var inc = document.getElementById('qty-inc');

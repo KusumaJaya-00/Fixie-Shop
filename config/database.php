@@ -1,41 +1,29 @@
 <?php
-// Koneksi database (PDO) membaca dari file .env di root project.
-$envFile = __DIR__ . '/../.env';
-$env = [];
 
-if (file_exists($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) {
-            continue;
-        }
-        $parts = explode('=', $line, 2);
-        if (count($parts) === 2) {
-            $key = trim($parts[0]);
-            $value = trim($parts[1]);
-            if (preg_match('/^"([^"]*)"$/', $value, $matches) || preg_match('/^\'([^\']*)\'$/', $value, $matches)) {
-                $value = $matches[1];
-            }
-            $env[$key] = $value;
-        }
-    }
+try {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo '<h2>Konfigurasi Aplikasi Belum Siap</h2>';
+    echo '<p>Salin file <code>.env.example</code> menjadi <code>.env</code>, lalu isi kredensial yang diperlukan.</p>';
+    exit;
 }
 
-$dbHost     = $env['DB_HOST'] ?? '127.0.0.1';
-$dbName     = $env['DB_NAME'] ?? 'fixie_shop';
-$dbUser     = $env['DB_USER'] ?? 'root';
-$dbPassword = $env['DB_PASSWORD'] ?? '';
+$dbHost     = $_ENV['DB_HOST'];
+$dbName     = $_ENV['DB_NAME'];
+$dbUser     = $_ENV['DB_USER'];
+$dbPassword = $_ENV['DB_PASSWORD'];
 
-$connection = "mysql:host={$dbHost};dbname={$dbName}";
-
-$pdoOptions = [
+$dsn = "mysql:host={$dbHost};dbname={$dbName}";
+$options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     PDO::ATTR_EMULATE_PREPARES   => false,
 ];
 
 try {
-    return new PDO($connection, $dbUser, $dbPassword, $pdoOptions);
+    return new PDO($dsn, $dbUser, $dbPassword, $options);
 } catch (PDOException $e) {
-    die('Koneksi database gagal: ' . $e->getMessage());
+    die('Koneksi database gagal.');
 }

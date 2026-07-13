@@ -51,7 +51,7 @@ class User
             ':name'     => $data['name'],
             ':email'    => $data['email'],
             ':password' => $data['password'],
-            ':phone'    => $data['phone'] ?? null,
+            ':phone'    => $data['phone'],
         ]);
         return (int) $this->db->lastInsertId();
     }
